@@ -68,6 +68,15 @@ export default function SudokuBoard() {
     const cellValue = board[row][col];
     const isOriginal = originalBoard[row][col] !== 0;
     const isSelected = selectedCell && selectedCell.row === row && selectedCell.col === col;
+    
+    // Check if cell is in the same row, column or 3x3 grid as the selected cell
+    const isRelatedToSelected = selectedCell && (
+      selectedCell.row === row || // Same row
+      selectedCell.col === col || // Same column
+      (Math.floor(selectedCell.row / 3) === Math.floor(row / 3) && 
+       Math.floor(selectedCell.col / 3) === Math.floor(col / 3)) // Same 3x3 box
+    );
+    
     const isSameNumber = cellValue !== 0 && board.some((r, rIdx) => 
       r.some((c, cIdx) => 
         c === cellValue && (rIdx !== row || cIdx !== col)
@@ -91,6 +100,8 @@ export default function SudokuBoard() {
     // Background color
     if (isSelected) {
       className += " bg-blue-100";
+    } else if (isRelatedToSelected) {
+      className += " bg-blue-50";
     } else if (isOriginal) {
       className += " bg-slate-100";
     } else if (isSameNumber && cellValue !== 0) {

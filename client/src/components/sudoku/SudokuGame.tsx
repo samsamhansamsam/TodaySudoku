@@ -6,7 +6,7 @@ import Timer from "./Timer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Info, Check, RefreshCw } from "lucide-react";
+import { AlertCircle, Info, Check, RefreshCw, Volume2, VolumeX } from "lucide-react";
 import { useAudio } from "@/lib/stores/useAudio";
 
 export default function SudokuGame() {
@@ -28,7 +28,7 @@ export default function SudokuGame() {
   const [showGameOver, setShowGameOver] = useState(false);
 
   // Initialize audio
-  const { setBackgroundMusic, setHitSound, setSuccessSound } = useAudio();
+  const { setBackgroundMusic, setHitSound, setSuccessSound, toggleMute, isMuted } = useAudio();
   
   useEffect(() => {
     // Setup audio elements
@@ -85,7 +85,18 @@ export default function SudokuGame() {
               <CardTitle className="text-2xl font-bold">Sudoku Puzzle</CardTitle>
               <CardDescription>Fill in the grid with numbers from 1-9</CardDescription>
             </div>
-            <Timer seconds={elapsedSeconds} />
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={toggleMute}
+                title={isMuted ? "Unmute" : "Mute"}
+                className="h-8 w-8"
+              >
+                {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+              </Button>
+              <Timer seconds={elapsedSeconds} />
+            </div>
           </div>
         </CardHeader>
 
