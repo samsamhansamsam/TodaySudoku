@@ -45,16 +45,19 @@ export default function SudokuGame() {
     setHitSound(hitSfx);
     setSuccessSound(successSfx);
     
-    // Set up Kaboom
-    if (canvasRef.current) {
-      setupKaboom(canvasRef.current);
-    }
-    
     // Clean up on unmount
     return () => {
       stopTimer();
     };
   }, []);
+  
+  // Setup Kaboom whenever the canvas ref changes
+  useEffect(() => {
+    if (canvasRef.current && isGameStarted) {
+      console.log("Setting up Kaboom with canvas");
+      setupKaboom(canvasRef.current);
+    }
+  }, [canvasRef, isGameStarted]);
   
   useEffect(() => {
     if (hasWon) {
@@ -124,8 +127,8 @@ export default function SudokuGame() {
           ) : (
             <div className="flex flex-col items-center">
               <div className="relative w-full max-w-md aspect-square mb-4">
-                <canvas ref={canvasRef} className="w-full h-full" />
-                <SudokuBoard />
+                <canvas ref={canvasRef} className="w-full h-full absolute inset-0" />
+                {isGameStarted && <SudokuBoard />}
               </div>
               
               <Controls />

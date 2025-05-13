@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSudoku } from "@/lib/stores/useSudoku";
 import { useAudio } from "@/lib/stores/useAudio";
-import { k } from "@/lib/kaboom/setup";
+import { k, destroyAll } from "@/lib/kaboom/setup";
 
 export default function SudokuBoard() {
   const { 
@@ -20,17 +20,29 @@ export default function SudokuBoard() {
   
   const { playHit, playSuccess } = useAudio();
 
+  // Track if kaboom is initialized
+  const [isKaboomInitialized, setIsKaboomInitialized] = useState(false);
+
   // Render the Sudoku board using Kaboom
   useEffect(() => {
-    if (!k || !board.length) return;
+    if (!k || !board.length) {
+      console.log("No kaboom instance or board is empty");
+      return;
+    }
 
+    console.log("Rendering board with Kaboom");
+    setIsKaboomInitialized(true);
+    
     // Clear previous scene
     k.destroyAll();
 
-    const CELL_SIZE = Math.min(k.width(), k.height()) / 9;
+    // Get dimensions for the grid
+    const kWidth = k.width();
+    const kHeight = k.height();
+    const CELL_SIZE = Math.min(kWidth, kHeight) / 9;
     const GRID_SIZE = CELL_SIZE * 9;
-    const OFFSET_X = (k.width() - GRID_SIZE) / 2;
-    const OFFSET_Y = (k.height() - GRID_SIZE) / 2;
+    const OFFSET_X = (kWidth - GRID_SIZE) / 2;
+    const OFFSET_Y = (kHeight - GRID_SIZE) / 2;
     
     // Colors
     const GRID_BG = k.rgb(248, 250, 252);
