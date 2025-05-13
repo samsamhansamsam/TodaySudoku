@@ -22,11 +22,25 @@ export default function Controls() {
     toggleNoteMode,
     clearCell,
     originalBoard,
-    toggleNote
+    toggleNote,
+    board
   } = useSudoku();
   
   const { playHit } = useAudio();
   const isMobile = useIsMobile();
+  
+  // Count how many times each number appears on the board
+  const numberCounts = Array(10).fill(0); // 0-9 (we ignore index 0)
+  
+  // Calculate the count of each number on the board
+  for (let row = 0; row < 9; row++) {
+    for (let col = 0; col < 9; col++) {
+      const value = board[row][col];
+      if (value > 0) {
+        numberCounts[value]++;
+      }
+    }
+  }
 
   // Handle keyboard events
   useEffect(() => {
@@ -119,26 +133,38 @@ export default function Controls() {
     }
   };
 
-  const isOriginalCell = selectedCell && originalBoard[selectedCell.row][selectedCell.col] !== 0;
+  // Check if selected cell is an original cell (provided at start)
+  const isOriginalCell = selectedCell ? originalBoard[selectedCell.row][selectedCell.col] !== 0 : false;
 
   return (
     <div className="w-full max-w-md">
       {/* Number buttons */}
       <div className="grid grid-cols-9 gap-1 mb-4">
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-          <Button
-            key={num}
-            variant="outline"
-            className={cn(
-              "aspect-square text-lg font-medium",
-              isMobile ? "h-10 w-10" : ""
-            )}
-            onClick={() => handleNumberClick(num)}
-            disabled={!selectedCell || isOriginalCell}
-          >
-            {num}
-          </Button>
-        ))}
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => {
+          // Check if the number has been placed 9 times (maximum for Sudoku)
+          const isFullyPlaced = numberCounts[num] >= 9;
+          
+          return (
+            <Button
+              key={num}
+              variant="outline"
+              className={cn(
+                "aspect-square text-lg font-medium relative",
+                isMobile ? "h-10 w-10" : "",
+                isFullyPlaced ? "opacity-30" : ""
+              )}
+              onClick={() => handleNumberClick(num)}
+              disabled={!selectedCell || isOriginalCell || isFullyPlaced}
+            >
+              {num}
+              {isFullyPlaced && (
+                <div className="absolute inset-0 flex items-center justify-center bg-background/30">
+                  <div className="w-full border-t border-red-500"></div>
+                </div>
+              )}
+            </Button>
+          );
+        })}
       </div>
 
       {/* Control buttons */}
