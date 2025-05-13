@@ -149,7 +149,7 @@ export default function SudokuBoard() {
   };
 
   return (
-    <div className="grid grid-cols-9 border border-slate-400 bg-white w-full aspect-square">
+    <div className="grid grid-cols-9 border border-slate-400 bg-white w-full aspect-square select-none touch-manipulation">
       {board.map((rowValues, rowIndex) => 
         rowValues.map((cellValue, colIndex) => {
           const { cellClass, textClass } = getCellStyle(rowIndex, colIndex);
@@ -158,15 +158,15 @@ export default function SudokuBoard() {
           return (
             <div 
               key={`cell-${rowIndex}-${colIndex}`}
-              className={cellClass}
+              className={`${cellClass} min-h-[28px] md:min-h-[40px]`}
               onClick={() => handleCellClick(rowIndex, colIndex)}
             >
               {cellValue !== 0 ? (
-                <span className={`text-2xl ${textClass}`}>{cellValue}</span>
+                <span className={`text-xl md:text-2xl ${textClass}`}>{cellValue}</span>
               ) : (
                 <div className="grid grid-cols-3 grid-rows-3 w-full h-full p-0.5">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                    <span key={num} className="text-[8px] md:text-[10px] flex items-center justify-center text-slate-600">
+                    <span key={num} className="text-[7px] sm:text-[8px] md:text-[10px] flex items-center justify-center text-slate-600">
                       {cellNotes.includes(num) ? num : ""}
                     </span>
                   ))}
