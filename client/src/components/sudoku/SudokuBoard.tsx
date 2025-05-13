@@ -77,6 +77,12 @@ export default function SudokuBoard() {
        Math.floor(selectedCell.col / 3) === Math.floor(col / 3)) // Same 3x3 box
     );
     
+    // Check if the selected cell contains a number and if this cell has the same number
+    const isMatchingSelectedNumber = selectedCell && 
+      board[selectedCell.row][selectedCell.col] !== 0 && 
+      cellValue === board[selectedCell.row][selectedCell.col] &&
+      (selectedCell.row !== row || selectedCell.col !== col); // Not the selected cell itself
+    
     const isSameNumber = cellValue !== 0 && board.some((r, rIdx) => 
       r.some((c, cIdx) => 
         c === cellValue && (rIdx !== row || cIdx !== col)
@@ -99,14 +105,24 @@ export default function SudokuBoard() {
     if (col % 3 === 2 && col < 8) className += " border-r-2 border-r-slate-500";
     if (row % 3 === 2 && row < 8) className += " border-b-2 border-b-slate-500";
     
-    // Background color
+    // Background color - Prioritized for visual clarity
     if (isSelected) {
-      className += " bg-blue-200";
+      // Selected cell gets highest priority with the most distinct color
+      className += " bg-blue-300";
+    } else if (isMatchingSelectedNumber) {
+      // Cells with same number as selected cell get a unique highlight color
+      className += " bg-purple-100";
+    } else if (isRelatedToSelected && isOriginal) {
+      // Overlapping regions (original number cell in the same row/col/box as selected)
+      className += " bg-green-50";
     } else if (isRelatedToSelected) {
+      // Regular cells in the same row/col/box as selected
       className += " bg-blue-50";
     } else if (isOriginal) {
+      // Original cells provided at game start
       className += " bg-amber-50";
     } else if (isSameNumber && cellValue !== 0) {
+      // Numbers that occur multiple times on the board
       className += " bg-slate-50";
     }
     
