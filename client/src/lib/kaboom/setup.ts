@@ -12,9 +12,13 @@ export function destroyAll(tag?: string) {
       } else {
         // If no tag is provided, destroy everything
         const allObjects = k.get();
-        allObjects.forEach(obj => {
-          k?.destroy(obj);
-        });
+        if (allObjects && Array.isArray(allObjects)) {
+          allObjects.forEach(obj => {
+            if (obj && k) {
+              k.destroy(obj);
+            }
+          });
+        }
       }
     } catch (e) {
       console.error("Error destroying Kaboom objects:", e);

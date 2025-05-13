@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSudoku } from "@/lib/stores/useSudoku";
 import SudokuBoard from "./SudokuBoard";
 import Controls from "./Controls";
@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, Info, Check, RefreshCw } from "lucide-react";
 import { useAudio } from "@/lib/stores/useAudio";
-import { setupKaboom } from "@/lib/kaboom/setup";
 
 export default function SudokuGame() {
   const { 
@@ -25,12 +24,11 @@ export default function SudokuGame() {
     resetTimer
   } = useSudoku();
   
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
 
   // Initialize audio
-  const { setBackgroundMusic, setHitSound, setSuccessSound, toggleMute } = useAudio();
+  const { setBackgroundMusic, setHitSound, setSuccessSound } = useAudio();
   
   useEffect(() => {
     // Setup audio elements
@@ -50,14 +48,6 @@ export default function SudokuGame() {
       stopTimer();
     };
   }, []);
-  
-  // Setup Kaboom whenever the canvas ref changes
-  useEffect(() => {
-    if (canvasRef.current && isGameStarted) {
-      console.log("Setting up Kaboom with canvas");
-      setupKaboom(canvasRef.current);
-    }
-  }, [canvasRef, isGameStarted]);
   
   useEffect(() => {
     if (hasWon) {
@@ -127,8 +117,7 @@ export default function SudokuGame() {
           ) : (
             <div className="flex flex-col items-center">
               <div className="relative w-full max-w-md aspect-square mb-4">
-                <canvas ref={canvasRef} className="w-full h-full absolute inset-0" />
-                {isGameStarted && <SudokuBoard />}
+                <SudokuBoard />
               </div>
               
               <Controls />
