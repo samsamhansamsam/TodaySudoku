@@ -88,8 +88,10 @@ export default function SudokuBoard() {
 
     let className = "flex items-center justify-center relative aspect-square h-full";
     
-    // Border styling
-    className += " border-slate-300";
+    // Border styling - Add thin border for all cells
+    className += " border border-slate-300";
+    
+    // Add thicker borders for 3x3 grid boundaries
     if (col === 0) className += " border-l-2 border-l-slate-500";
     if (col === 8) className += " border-r-2 border-r-slate-500";
     if (row === 0) className += " border-t-2 border-t-slate-500";
@@ -99,11 +101,11 @@ export default function SudokuBoard() {
     
     // Background color
     if (isSelected) {
-      className += " bg-blue-100";
+      className += " bg-blue-200";
     } else if (isRelatedToSelected) {
       className += " bg-blue-50";
     } else if (isOriginal) {
-      className += " bg-slate-100";
+      className += " bg-amber-50";
     } else if (isSameNumber && cellValue !== 0) {
       className += " bg-slate-50";
     }
@@ -117,6 +119,9 @@ export default function SudokuBoard() {
     } else {
       textClass += " text-slate-900";
     }
+    
+    // Add shadow on hovering
+    className += " hover:shadow-inner";
     
     return { cellClass: className, textClass };
   };
