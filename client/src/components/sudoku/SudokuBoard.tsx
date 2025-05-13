@@ -77,7 +77,7 @@ export default function SudokuBoard() {
     // Calculate if there's a conflict
     const hasConflict = cellValue !== 0 && !isValidPlacement(row, col, cellValue);
 
-    let className = "flex items-center justify-center relative";
+    let className = "flex items-center justify-center relative aspect-square h-full";
     
     // Border styling
     className += " border-slate-300";
@@ -132,15 +132,13 @@ export default function SudokuBoard() {
               {cellValue !== 0 ? (
                 <span className={`text-2xl ${textClass}`}>{cellValue}</span>
               ) : (
-                cellNotes.length > 0 && (
-                  <div className="grid grid-cols-3 grid-rows-3 w-full h-full p-0.5">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                      <span key={num} className="text-[8px] md:text-[10px] flex items-center justify-center text-slate-600">
-                        {cellNotes.includes(num) ? num : ""}
-                      </span>
-                    ))}
-                  </div>
-                )
+                <div className="grid grid-cols-3 grid-rows-3 w-full h-full p-0.5">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+                    <span key={num} className="text-[8px] md:text-[10px] flex items-center justify-center text-slate-600">
+                      {cellNotes.includes(num) ? num : ""}
+                    </span>
+                  ))}
+                </div>
               )}
             </div>
           );
