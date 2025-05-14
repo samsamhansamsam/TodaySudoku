@@ -1,55 +1,92 @@
 import { solveBoard, hasUniqueSolution } from "./solver";
 
 // Generate a new Sudoku puzzle with the specified number of clues
-export function generateSudokuPuzzle(difficulty: "easy" | "medium" | "hard" = "medium"): number[][] {
-  // Create a solved board
-  const solvedBoard = generateSolvedBoard();
-  if (!solvedBoard) {
-    throw new Error("Failed to generate solved board");
-  }
+// 전역 변수로 오늘의 퍼즐 정보 저장
+let dailyPuzzle: {
+  date: string;
+  solvedBoard: number[][];
+  cellsToKeep: [number, number][];
+} | null = null;
 
-  // Determine number of clues based on difficulty
+// GTM 기반 날짜 반환
+function getGTMDate(): string {
+  const now = new Date();
+  return `${now.getUTCFullYear()}-${now.getUTCMonth() + 1}-${now.getUTCDate()}`;
+}
+
+// 오늘의 날짜를 시드값으로 사용하는 간단한 난수 생성기
+function seededRandom(seed: string): () => number {
+  let s = 0;
+  for (let i = 0; i < seed.length; i++) {
+    s += seed.charCodeAt(i);
+  }
+  
+  return function() {
+    s = Math.sin(s) * 10000;
+    return s - Math.floor(s);
+  };
+}
+
+// 시드 기반 배열 섞기
+function seededShuffle<T>(array: T[], seed: string): T[] {
+  const random = seededRandom(seed);
+  const result = [...array];
+  
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  
+  return result;
+}
+
+export function generateSudokuPuzzle(difficulty: "easy" | "medium" | "hard" = "medium"): number[][] {
+  const today = getGTMDate();
+  
+  // 오늘의 퍼즐이 아직 생성되지 않았거나 날짜가 바뀌었다면 새로 생성
+  if (!dailyPuzzle || dailyPuzzle.date !== today) {
+    console.log("Generating new daily puzzle for", today);
+    
+    // 시드값 기반으로 일관된 보드 생성
+    const solvedBoard = generateSolvedBoard(today);
+    if (!solvedBoard) {
+      throw new Error("Failed to generate solved board");
+    }
+    
+    // 시드값 기반으로 고정된 셀 선택
+    const cellPositions = getAllCellPositions();
+    const shuffledCells = seededShuffle(cellPositions, today);
+    
+    // 오늘의 퍼즐 정보 저장
+    dailyPuzzle = {
+      date: today,
+      solvedBoard,
+      cellsToKeep: shuffledCells
+    };
+  }
+  
+  // 난이도에 따라 공개할 셀 수 결정
   const clues = getDifficultyClues(difficulty);
   
-  // Create a copy to work with
-  let puzzle = solvedBoard.map(row => [...row]);
+  // 보드 복사
+  const puzzle = dailyPuzzle.solvedBoard.map(row => [...row]);
   
-  // Randomly remove numbers to create the puzzle
-  const cells = shuffleArray(getAllCellPositions());
+  // 유지할 셀 선택 (난이도에 따라 다름)
+  const cellsToKeep = dailyPuzzle.cellsToKeep.slice(0, clues);
+  const cellsToKeepSet = new Set(cellsToKeep.map(([row, col]) => `${row},${col}`));
   
-  // Try to create a puzzle with a unique solution
-  let attempts = 0;
-  let isUnique = false;
-  
-  while (!isUnique && attempts < 10) {
-    attempts++;
-    
-    // Reset the puzzle
-    puzzle = solvedBoard.map(row => [...row]);
-    
-    // Cells to keep (clues)
-    const cellsToKeep = cells.slice(0, clues);
-    const cellsToKeepSet = new Set(cellsToKeep.map(([row, col]) => `${row},${col}`));
-    
-    // Remove all cells except the ones to keep
-    for (let row = 0; row < 9; row++) {
-      for (let col = 0; col < 9; col++) {
-        if (!cellsToKeepSet.has(`${row},${col}`)) {
-          puzzle[row][col] = 0;
-        }
+  // 유지할 셀 외에는 모두 삭제
+  for (let row = 0; row < 9; row++) {
+    for (let col = 0; col < 9; col++) {
+      if (!cellsToKeepSet.has(`${row},${col}`)) {
+        puzzle[row][col] = 0;
       }
     }
-    
-    // Check if the puzzle has a unique solution
-    isUnique = hasUniqueSolution(puzzle);
-    
-    // If we've found a unique solution or we're out of attempts, exit the loop
-    if (isUnique || attempts >= 10) {
-      if (!isUnique && attempts >= 10) {
-        console.warn("Could not generate a puzzle with a unique solution after multiple attempts");
-      }
-      break;
-    }
+  }
+  
+  // 퍼즐이 유일해를 갖는지 확인
+  if (!hasUniqueSolution(puzzle)) {
+    console.warn("Warning: Daily puzzle does not have a unique solution");
   }
   
   return puzzle;
@@ -69,13 +106,17 @@ function getDifficultyClues(difficulty: "easy" | "medium" | "hard"): number {
   }
 }
 
-// Generate a fully solved Sudoku board
-function generateSolvedBoard(): number[][] | null {
+// Generate a fully solved Sudoku board using a seed for consistent generation
+function generateSolvedBoard(seed?: string): number[][] | null {
   // Start with an empty board
   const board = Array(9).fill(0).map(() => Array(9).fill(0));
   
-  // Fill in the first row with a random permutation of 1-9
-  const firstRow = shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  // Fill in the first row with a seeded permutation of 1-9
+  const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const firstRow = seed 
+    ? seededShuffle(numbers, seed) 
+    : shuffleArray(numbers);
+  
   for (let i = 0; i < 9; i++) {
     board[0][i] = firstRow[i];
   }
@@ -88,8 +129,9 @@ function generateSolvedBoard(): number[][] | null {
   }
   
   // Solve the board
-  if (solveBoard(board)) {
-    return board;
+  const boardCopy = board.map(row => [...row]);
+  if (solveBoard(boardCopy)) {
+    return boardCopy; // 원본이 아닌 해결된 복사본 반환
   }
   
   // If solving fails, try again

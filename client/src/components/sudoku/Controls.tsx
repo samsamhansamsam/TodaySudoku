@@ -107,7 +107,10 @@ export default function Controls() {
   return (
     <div className="w-full max-w-md">
       {/* Number buttons */}
-      <div className="grid grid-cols-9 gap-1 mb-4">
+      <div className={cn(
+        "grid gap-1 mb-4",
+        isMobile ? "grid-cols-3 grid-rows-3" : "grid-cols-9"
+      )}>
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => {
           // Check if the number has been placed 9 times (maximum for Sudoku)
           const isFullyPlaced = numberCounts[num] >= 9;
@@ -118,7 +121,7 @@ export default function Controls() {
               variant="outline"
               className={cn(
                 "aspect-square text-lg font-medium relative",
-                isMobile ? "h-10 w-10" : "",
+                isMobile ? "h-12 w-12 p-0" : "",
                 isFullyPlaced ? "opacity-30" : ""
               )}
               onClick={() => handleNumberClick(num)}

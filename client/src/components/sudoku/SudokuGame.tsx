@@ -28,7 +28,23 @@ export default function SudokuGame() {
     resetTimer
   } = useSudoku();
   
-  const [isGameStarted, setIsGameStarted] = useState(false);
+  // 로컬 스토리지에서 게임 시작 상태 복원
+  const [isGameStarted, setIsGameStarted] = useState(() => {
+    try {
+      // localStorage와 sessionStorage에서 확인
+      const storageData = localStorage.getItem('sudoku-storage') || sessionStorage.getItem('sudoku-storage');
+      if (storageData) {
+        const storedState = JSON.parse(storageData);
+        // 저장된 상태가 있고 게임이 시작되었다면 true 반환
+        if (storedState.state && storedState.state.board && storedState.state.board.length > 0) {
+          return true;
+        }
+      }
+    } catch (e) {
+      console.error("Error loading game state:", e);
+    }
+    return false;
+  });
   const [showGameOver, setShowGameOver] = useState(false);
   const [showLeaderboardForm, setShowLeaderboardForm] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);

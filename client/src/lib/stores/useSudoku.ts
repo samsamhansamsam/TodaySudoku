@@ -292,6 +292,31 @@ export const useSudoku = create(
   }
 }), {
   name: "sudoku-storage", // 저장소 이름
+  version: 1, // 스토리지 버전
+  storage: {
+    getItem: (name) => {
+      // localStorage에서 먼저 시도하고, sessionStorage 폴백
+      const persistedState = localStorage.getItem(name) || sessionStorage.getItem(name);
+      return persistedState ? JSON.parse(persistedState) : null;
+    },
+    setItem: (name, value) => {
+      try {
+        // localStorage와 sessionStorage 모두에 저장
+        localStorage.setItem(name, JSON.stringify(value));
+        sessionStorage.setItem(name, JSON.stringify(value));
+      } catch (err) {
+        console.error("Error saving state:", err);
+      }
+    },
+    removeItem: (name) => {
+      try {
+        localStorage.removeItem(name);
+        sessionStorage.removeItem(name);
+      } catch (err) {
+        console.error("Error removing state:", err);
+      }
+    },
+  },
   partialize: (state) => {
     // 타입 어설션을 사용하여 Partial<SudokuState>로 취급
     const savedState = {
@@ -305,7 +330,8 @@ export const useSudoku = create(
       timerInterval: null, // 타이머는 초기화하여 저장
       elapsedSeconds: state.elapsedSeconds,
       isComplete: state.isComplete,
-      hasWon: state.hasWon
+      hasWon: state.hasWon,
+      isGameStarted: true // 게임이 시작되었음을 명시적으로 저장
     };
     return savedState as Partial<SudokuState>;
   },
