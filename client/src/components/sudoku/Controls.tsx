@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Pencil, Eraser } from "lucide-react";
 import { useEffect } from "react";
 import { useSudoku } from "@/lib/stores/useSudoku";
 import { useAudio } from "@/lib/stores/useAudio";
@@ -134,7 +135,34 @@ export default function Controls() {
         })}
       </div>
 
-      {/* Control buttons (Hidden) */}
+      {/* Control buttons */}
+      <div className="flex justify-center gap-2 mb-4">
+        <Button
+          variant={isNoteMode ? "default" : "outline"}
+          className={cn(
+            "gap-1",
+            isMobile ? "h-12 px-3" : ""
+          )}
+          onClick={toggleNoteMode}
+          disabled={!selectedCell || isOriginalCell}
+        >
+          <Pencil className={cn("h-4 w-4", isMobile ? "h-5 w-5" : "")} />
+          <span className={cn(isMobile ? "hidden sm:inline-block" : "")}>Notes</span>
+        </Button>
+        
+        <Button
+          variant="outline"
+          className={cn(
+            "gap-1",
+            isMobile ? "h-12 px-3" : ""
+          )}
+          onClick={() => selectedCell && clearCell(selectedCell.row, selectedCell.col)}
+          disabled={!selectedCell || isOriginalCell}
+        >
+          <Eraser className={cn("h-4 w-4", isMobile ? "h-5 w-5" : "")} />
+          <span className={cn(isMobile ? "hidden sm:inline-block" : "")}>Erase</span>
+        </Button>
+      </div>
     </div>
   );
 }
