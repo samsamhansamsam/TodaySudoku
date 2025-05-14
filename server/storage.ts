@@ -91,11 +91,17 @@ export class DbStorage implements IStorage {
   }
   
   async getLeaderboard(difficulty: string, limit: number = 10): Promise<Leaderboard[]> {
+    // Get current date in UTC for puzzle_id filtering
+    const today = new Date();
+    const dateKey = `${today.getUTCFullYear()}-${today.getUTCMonth() + 1}-${today.getUTCDate()}`;
+    const puzzleIdPrefix = `${dateKey}-${difficulty}`;
+    
     return await db
       .select()
       .from(schema.leaderboard)
       .where(eq(schema.leaderboard.difficulty, difficulty))
-      .orderBy(desc(schema.leaderboard.time_seconds))
+      .where(sql`${schema.leaderboard.puzzle_id} LIKE ${puzzleIdPrefix + '%'}`)
+      .orderBy(asc(schema.leaderboard.time_seconds)) // 가장 빠른 시간이 상위에 오도록 정렬
       .limit(limit);
   }
   

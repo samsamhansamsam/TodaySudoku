@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { LeaderboardEntry } from "@/lib/queryClient";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Medal, Clock } from "lucide-react";
+import { Loader2, Medal, Clock, RefreshCw } from "lucide-react";
 
 interface LeaderboardProps {
   getLeaderboard: (difficulty: string) => Promise<LeaderboardEntry[]>;
@@ -43,6 +43,24 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
     if (!dateString) return "";
     const date = new Date(dateString);
     return date.toLocaleDateString();
+  };
+  
+  // 다음 재설정까지 남은 시간 계산
+  const getRemainingTimeUntilReset = () => {
+    const now = new Date();
+    const tomorrow = new Date();
+    tomorrow.setUTCHours(24, 0, 0, 0); // 다음날 UTC 자정
+    
+    const diffMs = tomorrow.getTime() - now.getTime();
+    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return (
+      <div className="flex items-center justify-center gap-1">
+        <RefreshCw className="h-3 w-3" />
+        <span>Resets in {diffHrs}h {diffMins}m</span>
+      </div>
+    );
   };
   
   return (
