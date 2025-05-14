@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, PersistOptions } from "zustand/middleware";
 import { generateSudokuPuzzle } from "../sudoku/generator";
 import { validateSudokuBoard, isBoardComplete, isValidPlacement } from "../sudoku/validator";
 import { copyBoard, solveBoard } from "../sudoku/solver";
@@ -49,8 +49,16 @@ type SudokuState = {
   resetTimer: () => void;
 };
 
-export const useSudoku = create(
-  persist<SudokuState>(
+type SudokuStateStorage = Pick<
+  SudokuState, 
+  'board' | 'originalBoard' | 'solution' | 'difficulty' | 
+  'selectedCell' | 'isNoteMode' | 'notes' | 
+  'isComplete' | 'hasWon' | 'elapsedSeconds'
+>;
+
+// 문제를 해결하기 위해 create 메서드에 타입 매개변수 추가
+export const useSudoku = create<SudokuState>()(
+  persist<SudokuState, SudokuStateStorage>(
     (set, get) => ({
   // Initial state
   board: Array(9).fill(0).map(() => Array(9).fill(0)),
