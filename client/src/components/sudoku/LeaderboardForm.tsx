@@ -30,7 +30,7 @@ export function LeaderboardForm({
     e.preventDefault();
     
     if (!nickname.trim()) {
-      setError("닉네임을 입력해주세요.");
+      setError("Please enter a nickname.");
       return;
     }
     
@@ -66,20 +66,20 @@ export function LeaderboardForm({
     <div className="p-4 bg-white rounded-lg shadow-md">
       <div className="flex items-center gap-2 mb-4">
         <Trophy className="h-5 w-5 text-yellow-500" />
-        <h2 className="text-lg font-semibold">리더보드에 기록하기</h2>
+        <h2 className="text-lg font-semibold">Add to Leaderboard</h2>
       </div>
       
       <p className="text-sm text-gray-500 mb-4">
-        축하합니다! {difficulty} 난이도의 퍼즐을 {Math.floor(elapsedSeconds / 60)}분 {elapsedSeconds % 60}초에 완료하셨습니다.
-        리더보드에 기록을 남기고 싶으시다면 닉네임을 입력해주세요.
+        Congratulations! You've completed the {difficulty} puzzle in {Math.floor(elapsedSeconds / 60)}m {elapsedSeconds % 60}s.
+        Enter your nickname to save your score to the leaderboard.
       </p>
       
       <form onSubmit={handleSubmit}>
         <div className="space-y-2 mb-4">
-          <Label htmlFor="nickname">닉네임</Label>
+          <Label htmlFor="nickname">Nickname</Label>
           <Input
             id="nickname"
-            placeholder="닉네임을 입력하세요"
+            placeholder="Enter your nickname"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
             maxLength={50}
@@ -95,14 +95,14 @@ export function LeaderboardForm({
             onClick={onSkip}
             disabled={isSubmitting}
           >
-            건너뛰기
+            Skip
           </Button>
           <Button 
             type="submit"
             disabled={isSubmitting}
           >
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            제출하기
+            Submit
           </Button>
         </div>
       </form>

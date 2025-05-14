@@ -23,8 +23,8 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
         const data = await getLeaderboard(activeTab);
         setEntries(data);
       } catch (err) {
-        console.error("리더보드 불러오기 실패:", err);
-        setError("리더보드를 불러오는데 실패했습니다. 다시 시도해 주세요.");
+        console.error("Failed to load leaderboard:", err);
+        setError("Failed to load the leaderboard. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -48,14 +48,14 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-center">리더보드</CardTitle>
+        <CardTitle className="text-center">Leaderboard</CardTitle>
       </CardHeader>
       
       <Tabs defaultValue="easy" value={activeTab} onValueChange={(value) => setActiveTab(value as "easy" | "medium" | "hard")}>
         <TabsList className="grid grid-cols-3 mb-4">
-          <TabsTrigger value="easy">쉬움</TabsTrigger>
-          <TabsTrigger value="medium">보통</TabsTrigger>
-          <TabsTrigger value="hard">어려움</TabsTrigger>
+          <TabsTrigger value="easy">Easy</TabsTrigger>
+          <TabsTrigger value="medium">Medium</TabsTrigger>
+          <TabsTrigger value="hard">Hard</TabsTrigger>
         </TabsList>
         
         <TabsContent value={activeTab}>
@@ -68,7 +68,7 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
               <div className="text-center text-red-500 p-4">{error}</div>
             ) : entries.length === 0 ? (
               <div className="text-center text-muted-foreground p-4">
-                아직 기록이 없습니다. 첫 번째 기록을 남겨보세요!
+                No records yet. Be the first to set a record!
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -76,14 +76,14 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
                   <thead>
                     <tr className="border-b">
                       <th className="text-left py-2 px-1 w-10">#</th>
-                      <th className="text-left py-2 px-1">닉네임</th>
+                      <th className="text-left py-2 px-1">Nickname</th>
                       <th className="text-left py-2 px-1">
                         <div className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
-                          <span>시간</span>
+                          <span>Time</span>
                         </div>
                       </th>
-                      <th className="text-left py-2 px-1 hidden md:table-cell">날짜</th>
+                      <th className="text-left py-2 px-1 hidden md:table-cell">Date</th>
                     </tr>
                   </thead>
                   <tbody>
