@@ -74,16 +74,48 @@ export default function SudokuGame() {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   
-  // 타이머 시작 - 단독 효과로 분리
+  // 키보드 단축키 처리 함수 추가
   useEffect(() => {
-    console.log("Timer effect running, isGameStarted:", isGameStarted);
-    // 게임이 시작된 상태라면 타이머 시작
-    if (isGameStarted) {
-      console.log("Starting timer");
+    // 시크릿 단축키: Alt+R을 누르면 로컬 스토리지 초기화
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Alt+R 단축키로 로컬 스토리지 초기화
+      if (e.altKey && e.key === 'r') {
+        // 로컬 스토리지 및 세션 스토리지 초기화
+        try {
+          localStorage.removeItem('sudoku-storage');
+          sessionStorage.removeItem('sudoku-storage');
+          console.log('Storage cleared! Reload the page to start fresh.');
+          alert('Storage cleared! The page will now reload.');
+          window.location.reload();
+        } catch (err) {
+          console.error('Error clearing storage:', err);
+        }
+      }
+    };
+    
+    // 키보드 이벤트 리스너 등록
+    window.addEventListener('keydown', handleKeyDown);
+    
+    // 클린업 함수
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+  
+  // 타이머 시작 - 참조용 변수 추가하여 타이머 중복 시작 방지
+  useEffect(() => {
+    // 이미 타이머가 실행 중인지 확인하기 위한 참조
+    const timerState = useSudoku.getState().timerInterval;
+    
+    // 게임이 시작된 상태이고 타이머가 실행 중이 아닐 때만 시작
+    if (isGameStarted && timerState === null) {
       startTimer();
     }
     
-    // 의존성 배열에서 startTimer를 제거하여 무한 루프 방지
+    return () => {
+      // 이 효과가 다시 실행될 때는 타이머를 중지하지 않음
+      // 컴포넌트가 언마운트될 때만 타이머 중지(위의 오디오 효과에서 처리)
+    };
   }, [isGameStarted]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // 보드 상태 추적

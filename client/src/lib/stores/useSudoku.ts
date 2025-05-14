@@ -296,7 +296,18 @@ export const useSudoku = create<SudokuState>()(
   
   // Reset the timer
   resetTimer: () => {
-    set({ elapsedSeconds: 0 });
+    const { timerInterval } = get();
+    
+    // 실행 중인 타이머가 있으면 정지
+    if (timerInterval !== null) {
+      clearInterval(timerInterval);
+    }
+    
+    // 경과 시간을 0으로 초기화하고 타이머 인터벌도 초기화
+    set({ 
+      elapsedSeconds: 0,
+      timerInterval: null
+    });
   }
 }), {
   name: "sudoku-storage", // 저장소 이름
