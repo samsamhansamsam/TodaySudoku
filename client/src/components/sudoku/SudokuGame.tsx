@@ -26,12 +26,9 @@ import {
   Info,
   Check,
   RefreshCw,
-  Volume2,
-  VolumeX,
   Trophy,
   HelpCircle,
 } from "lucide-react";
-import { useAudio } from "@/lib/stores/useAudio";
 import {
   LeaderboardEntry,
   saveLeaderboardEntry,
@@ -189,11 +186,14 @@ export default function SudokuGame() {
   }, [hasWon, stopTimer]);
 
   const handleNewGame = () => {
+    // 사용자가 난이도를 명시적으로 선택하지 않았다면 easy로 설정
+    const currentDifficulty = difficulty || "easy";
+    setDifficulty(currentDifficulty);
+    
     // 1. 이 난이도가 이미 완료된 경우 바로 리더보드로 이동
-
-    if (isDifficultyCompleted(difficulty)) {
+    if (isDifficultyCompleted(currentDifficulty)) {
       // 이미 완료된 난이도면 바로 리더보드 표시
-      generateNewGame(difficulty); // 오늘의 퍼즐 로드
+      generateNewGame(currentDifficulty); // 오늘의 퍼즐 로드
       setIsGameStarted(true);
       setShowGameOver(true);
       setShowLeaderboardForm(false);
@@ -202,7 +202,7 @@ export default function SudokuGame() {
     }
 
     // 2. 새 게임 시작
-    generateNewGame(difficulty);
+    generateNewGame(currentDifficulty);
     resetTimer();
     startTimer();
     setIsGameStarted(true);
@@ -223,6 +223,13 @@ export default function SudokuGame() {
     setDifficulty(diff as "easy" | "medium" | "hard");
   };
 
+  const memoizedGetLeaderboard = useCallback(
+    (difficulty: "easy" | "medium" | "hard") => {
+      return getLeaderboard(difficulty);
+    },
+    [],
+  );
+
   return (
     <div className="w-full max-w-4xl px-4 py-8">
       <Card className="w-full">
@@ -230,19 +237,6 @@ export default function SudokuGame() {
           <div className="flex flex-row justify-between items-center gap-2">
             <CardTitle className="text-xl font-bold">Sudoku Puzzle</CardTitle>
             <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={toggleMute}
-                title={isMuted ? "Unmute" : "Mute"}
-                className="h-8 w-8"
-              >
-                {isMuted ? (
-                  <VolumeX className="h-4 w-4" />
-                ) : (
-                  <Volume2 className="h-4 w-4" />
-                )}
-              </Button>
               <Timer seconds={elapsedSeconds} />
             </div>
           </div>
@@ -375,11 +369,7 @@ export default function SudokuGame() {
 
                 {showLeaderboard && (
                   <CardContent>
-                    <Leaderboard
-                      getLeaderboard={useCallback((difficulty) => {
-                        return getLeaderboard(difficulty);
-                      }, [])}
-                    />
+                    <Leaderboard getLeaderboard={memoizedGetLeaderboard} />
                   </CardContent>
                 )}
 
