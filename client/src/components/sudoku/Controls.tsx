@@ -40,6 +40,10 @@ export default function Controls() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedCell) return;
       
+      // 퍼즐이 이미 완료되었는지 확인
+      const { hasWon } = useSudoku.getState();
+      if (hasWon) return; // 완료된 경우 입력 처리하지 않음
+      
       // Number keys
       if (/^[1-9]$/.test(e.key)) {
         playHit();
@@ -90,6 +94,11 @@ export default function Controls() {
 
   const handleNumberClick = (num: number) => {
     if (!selectedCell) return;
+    
+    // 퍼즐이 이미 완료되었는지 확인
+    const { hasWon } = useSudoku.getState();
+    if (hasWon) return; // 완료된 경우 입력 처리하지 않음
+    
     playHit();
     
     if (isNoteMode) {
@@ -123,7 +132,7 @@ export default function Controls() {
                 isFullyPlaced ? "opacity-30" : ""
               )}
               onClick={() => handleNumberClick(num)}
-              disabled={!selectedCell || isOriginalCell || isFullyPlaced}
+              disabled={!selectedCell || isOriginalCell || isFullyPlaced || useSudoku.getState().hasWon}
             >
               {num}
               {isFullyPlaced && (

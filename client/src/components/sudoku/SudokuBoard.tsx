@@ -24,6 +24,9 @@ export default function SudokuBoard() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedCell) return;
       
+      // 퍼즐이 이미 완료된 경우 입력 처리하지 않음
+      if (hasWon) return;
+      
       // Number keys (1-9)
       if (/^[1-9]$/.test(e.key)) {
         const num = parseInt(e.key);
