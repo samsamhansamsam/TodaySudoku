@@ -318,8 +318,8 @@ export const useSudoku = create(
     },
   },
   partialize: (state) => {
-    // 타입 어설션을 사용하여 Partial<SudokuState>로 취급
-    const savedState = {
+    // 필요한 데이터만 선택적으로 저장 (Partial<SudokuState>)
+    return {
       board: state.board,
       originalBoard: state.originalBoard,
       solution: state.solution,
@@ -327,13 +327,10 @@ export const useSudoku = create(
       selectedCell: state.selectedCell,
       isNoteMode: state.isNoteMode,
       notes: state.notes,
-      timerInterval: null, // 타이머는 초기화하여 저장
-      elapsedSeconds: state.elapsedSeconds,
       isComplete: state.isComplete,
       hasWon: state.hasWon,
-      isGameStarted: true // 게임이 시작되었음을 명시적으로 저장
+      elapsedSeconds: state.elapsedSeconds,
     };
-    return savedState as Partial<SudokuState>;
   },
 })
 );
