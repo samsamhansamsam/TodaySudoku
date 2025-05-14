@@ -64,7 +64,7 @@ export const useSudoku = create<SudokuState>()(
   board: Array(9).fill(0).map(() => Array(9).fill(0)),
   originalBoard: Array(9).fill(0).map(() => Array(9).fill(0)),
   solution: null,
-  difficulty: "medium",
+  difficulty: "easy",
   selectedCell: null,
   isNoteMode: false,
   notes: Array(9).fill(0).map(() => Array(9).fill(0).map(() => [])),

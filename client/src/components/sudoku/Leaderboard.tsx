@@ -49,6 +49,9 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
     <Card>
       <CardHeader>
         <CardTitle className="text-center">Leaderboard</CardTitle>
+        <div className="text-center text-muted-foreground text-sm mt-1">
+          Daily puzzle for {new Date().toLocaleDateString()}
+        </div>
       </CardHeader>
       
       <Tabs defaultValue="easy" value={activeTab} onValueChange={(value) => setActiveTab(value as "easy" | "medium" | "hard")}>
@@ -83,7 +86,7 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
                           <span>Time</span>
                         </div>
                       </th>
-                      <th className="text-left py-2 px-1 hidden md:table-cell">Date</th>
+
                     </tr>
                   </thead>
                   <tbody>
@@ -97,13 +100,15 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
                         </td>
                         <td className="py-2 px-1 font-medium">{entry.nickname}</td>
                         <td className="py-2 px-1">{formatTime(entry.time_seconds)}</td>
-                        <td className="py-2 px-1 hidden md:table-cell text-muted-foreground">
-                          {formatDate(entry.completed_at as unknown as string)}
-                        </td>
+
                       </tr>
                     ))}
                   </tbody>
                 </table>
+                <div className="mt-4 pt-2 text-center text-sm text-muted-foreground border-t">
+                  <div>Leaderboard resets at midnight UTC</div>
+                  <div>{getRemainingTimeUntilReset()}</div>
+                </div>
               </div>
             )}
           </CardContent>
