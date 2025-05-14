@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Eraser } from "lucide-react";
 import { useEffect } from "react";
 import { useSudoku } from "@/lib/stores/useSudoku";
-import { useAudio } from "@/lib/stores/useAudio";
+
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +19,7 @@ export default function Controls() {
     board
   } = useSudoku();
   
-  const { playHit } = useAudio();
+
   const isMobile = useIsMobile();
   
   // Count how many times each number appears on the board
@@ -46,7 +46,6 @@ export default function Controls() {
       
       // Number keys
       if (/^[1-9]$/.test(e.key)) {
-        playHit();
         const num = parseInt(e.key);
         
         if (isNoteMode) {

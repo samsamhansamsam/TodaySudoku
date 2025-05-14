@@ -83,30 +83,8 @@ export default function SudokuGame() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [currentBoard, setCurrentBoard] = useState<number[][]>([[]]);
 
-  // Initialize audio
-  const {
-    setBackgroundMusic,
-    setHitSound,
-    setSuccessSound,
-    toggleMute,
-    isMuted,
-  } = useAudio();
-
-  // 오디오 설정 - 일회성 작업이므로 의존성 배열을 비워둠
+  // 컴포넌트 언마운트 시 정리 작업
   useEffect(() => {
-    // Setup audio elements
-    const bgMusic = new Audio("/sounds/background.mp3");
-    bgMusic.loop = true;
-    bgMusic.volume = 0.3;
-
-    const hitSfx = new Audio("/sounds/hit.mp3");
-    const successSfx = new Audio("/sounds/success.mp3");
-
-    setBackgroundMusic(bgMusic);
-    setHitSound(hitSfx);
-    setSuccessSound(successSfx);
-
-    // Clean up on unmount
     return () => {
       // 컴포넌트 언마운트 시에만 타이머 정지
       stopTimer();
