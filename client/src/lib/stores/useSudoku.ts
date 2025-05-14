@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { generateSudokuPuzzle } from "../sudoku/generator";
 import { validateSudokuBoard, isBoardComplete, isValidPlacement } from "../sudoku/validator";
 import { copyBoard, solveBoard } from "../sudoku/solver";
@@ -48,7 +49,9 @@ type SudokuState = {
   resetTimer: () => void;
 };
 
-export const useSudoku = create<SudokuState>((set, get) => ({
+export const useSudoku = create(
+  persist<SudokuState>(
+    (set, get) => ({
   // Initial state
   board: Array(9).fill(0).map(() => Array(9).fill(0)),
   originalBoard: Array(9).fill(0).map(() => Array(9).fill(0)),
@@ -287,4 +290,17 @@ export const useSudoku = create<SudokuState>((set, get) => ({
   resetTimer: () => {
     set({ elapsedSeconds: 0 });
   }
-}));
+}), {
+  name: "sudoku-storage", // 저장소 이름
+  partialize: (state) => ({ 
+    // 필요한 상태만 저장
+    board: state.board,
+    originalBoard: state.originalBoard,
+    difficulty: state.difficulty,
+    notes: state.notes,
+    elapsedSeconds: state.elapsedSeconds,
+    isComplete: state.isComplete,
+    hasWon: state.hasWon
+  }),
+})
+);
