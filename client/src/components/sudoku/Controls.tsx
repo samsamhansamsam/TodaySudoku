@@ -98,8 +98,6 @@ export default function Controls() {
     const { hasWon } = useSudoku.getState();
     if (hasWon) return; // 완료된 경우 입력 처리하지 않음
     
-    playHit();
-    
     if (isNoteMode) {
       toggleNote(selectedCell.row, selectedCell.col, num);
     } else {

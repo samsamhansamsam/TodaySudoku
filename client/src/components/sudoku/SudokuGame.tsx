@@ -202,8 +202,8 @@ export default function SudokuGame() {
   };
 
   const memoizedGetLeaderboard = useCallback(
-    (difficulty: "easy" | "medium" | "hard") => {
-      return getLeaderboard(difficulty);
+    (difficulty: string) => {
+      return getLeaderboard(difficulty as "easy" | "medium" | "hard");
     },
     [],
   );
