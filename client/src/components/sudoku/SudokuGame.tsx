@@ -3,11 +3,14 @@ import { useSudoku } from "@/lib/stores/useSudoku";
 import SudokuBoard from "./SudokuBoard";
 import Controls from "./Controls";
 import Timer from "./Timer";
+import { LeaderboardForm } from "./LeaderboardForm"; 
+import { Leaderboard } from "./Leaderboard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Info, Check, RefreshCw, Volume2, VolumeX } from "lucide-react";
+import { AlertCircle, Info, Check, RefreshCw, Volume2, VolumeX, Trophy } from "lucide-react";
 import { useAudio } from "@/lib/stores/useAudio";
+import { LeaderboardEntry, saveLeaderboardEntry, getLeaderboard } from "@/lib/queryClient";
 
 export default function SudokuGame() {
   const { 
