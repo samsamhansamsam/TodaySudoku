@@ -1,12 +1,14 @@
 import { solveBoard, hasUniqueSolution } from "./solver";
 
 // Generate a new Sudoku puzzle with the specified number of clues
-// 전역 변수로 오늘의 퍼즐 정보 저장
-let dailyPuzzle: {
-  date: string;
-  solvedBoard: number[][];
-  cellsToKeep: [number, number][];
-} | null = null;
+// 전역 변수로 오늘의 퍼즐 정보 저장 (난이도 별로 따로 저장)
+let dailyPuzzles: {
+  [key in "easy" | "medium" | "hard"]?: {
+    date: string;
+    solvedBoard: number[][];
+    cellsToKeep: [number, number][];
+  }
+} = {};
 
 // GTM 기반 날짜 반환
 function getGTMDate(): string {
@@ -117,25 +119,26 @@ function seededShuffle<T>(array: T[], seed: string): T[] {
 export function generateSudokuPuzzle(difficulty: "easy" | "medium" | "hard" = "medium"): number[][] {
   const today = getGTMDate();
   
-  // 오늘의 퍼즐이 아직 생성되지 않았거나 날짜가 바뀌었다면 새로 생성
-  if (!dailyPuzzle || dailyPuzzle.date !== today) {
-    console.log("Generating new daily puzzle for", today);
+  // 이 난이도의 오늘 퍼즐이 아직 생성되지 않았거나 날짜가 바뀌었다면 새로 생성
+  if (!dailyPuzzles[difficulty] || dailyPuzzles[difficulty]?.date !== today) {
+    console.log(`Generating new daily puzzle for ${difficulty} difficulty on ${today}`);
     
-    // 시드값 기반으로 일관된 보드 생성
-    const solvedBoard = generateSolvedBoard(today);
+    // 난이도 별로 다른 시드 값 사용해 일관된 보드 생성
+    const difficultySpecificSeed = `${today}-${difficulty}`;
+    const solvedBoard = generateSolvedBoard(difficultySpecificSeed);
     if (!solvedBoard) {
-      throw new Error("Failed to generate solved board");
+      throw new Error(`Failed to generate solved board for ${difficulty} difficulty`);
     }
     
     // 시드값 기반으로 고정된 셀 선택 
     const cellPositions = getAllCellPositions();
     
-    // 첫 번째 셔플: 기본 셀 순서 결정
-    let shuffledCells = seededShuffle(cellPositions, today);
+    // 난이도별 고유한 셔플: 기본 셀 순서 결정
+    let shuffledCells = seededShuffle(cellPositions, difficultySpecificSeed);
     
     // 유일 해를 가진 퍼즐 생성을 위한 최소한의 위치 샘플링
     // 시드를 약간 변형하여 다양한 위치 집합 생성
-    const additionalSeed = today + "-unique";
+    const additionalSeed = `${difficultySpecificSeed}-unique`;
     let alternateShuffledCells = seededShuffle(cellPositions, additionalSeed);
     
     // 아래 난이도 별 셀 수에 맞춰 유일해 퍼즐을 찾기 위한 최소 클루 수
@@ -178,24 +181,24 @@ export function generateSudokuPuzzle(difficulty: "easy" | "medium" | "hard" = "m
       if (hasUniqueSolution(testPuzzle)) {
         uniqueSolutionFound = true;
         finalCellsToKeep = uniqueCells;
-        console.log("Found a puzzle with unique solution after", attempts, "attempts");
+        console.log(`Found a puzzle with unique solution for ${difficulty} after ${attempts} attempts`);
       } else {
         // 다음 시도를 위해 셔플 다시 수행
-        shuffledCells = seededShuffle(shuffledCells, today + "-" + attempts);
+        shuffledCells = seededShuffle(shuffledCells, difficultySpecificSeed + "-" + attempts);
         alternateShuffledCells = seededShuffle(alternateShuffledCells, additionalSeed + "-" + attempts);
       }
     }
     
     // 최종 선택된 셀로 퍼즐 저장
     // 유일해를 찾지 못한 경우 원래 셔플된 셀 사용
-    dailyPuzzle = {
+    dailyPuzzles[difficulty] = {
       date: today,
       solvedBoard,
       cellsToKeep: uniqueSolutionFound ? finalCellsToKeep : shuffledCells
     };
     
     if (!uniqueSolutionFound) {
-      console.warn("Could not find a puzzle with unique solution after multiple attempts, using fallback");
+      console.warn(`Could not find a puzzle with unique solution for ${difficulty} after multiple attempts, using fallback`);
     }
   }
   
@@ -203,10 +206,10 @@ export function generateSudokuPuzzle(difficulty: "easy" | "medium" | "hard" = "m
   const clues = getDifficultyClues(difficulty);
   
   // 보드 복사
-  const puzzle = dailyPuzzle.solvedBoard.map(row => [...row]);
+  const puzzle = dailyPuzzles[difficulty]!.solvedBoard.map(row => [...row]);
   
   // 유지할 셀 선택 (난이도에 따라 다름) 
-  const cellsToKeep = dailyPuzzle.cellsToKeep.slice(0, clues);
+  const cellsToKeep = dailyPuzzles[difficulty]!.cellsToKeep.slice(0, clues);
   const cellsToKeepSet = new Set(cellsToKeep.map(([row, col]) => `${row},${col}`));
   
   // 유지할 셀 외에는 모두 삭제

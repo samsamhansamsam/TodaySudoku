@@ -376,9 +376,9 @@ export default function SudokuGame() {
                 {showLeaderboard && (
                   <CardContent>
                     <Leaderboard
-                      getLeaderboard={(difficulty) =>
-                        getLeaderboard(difficulty)
-                      }
+                      getLeaderboard={useCallback((difficulty) => {
+                        return getLeaderboard(difficulty);
+                      }, [])}
                     />
                   </CardContent>
                 )}
