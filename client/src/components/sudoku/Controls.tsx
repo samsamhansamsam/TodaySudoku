@@ -1,12 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { 
-  Pencil,
-  Eraser, 
-  ChevronLeft, 
-  ChevronRight, 
-  ChevronUp, 
-  ChevronDown
-} from "lucide-react";
 import { useEffect } from "react";
 import { useSudoku } from "@/lib/stores/useSudoku";
 import { useAudio } from "@/lib/stores/useAudio";
@@ -106,32 +98,7 @@ export default function Controls() {
     }
   };
 
-  const handleArrowClick = (direction: 'up' | 'down' | 'left' | 'right') => {
-    if (!selectedCell) return;
-    
-    switch (direction) {
-      case 'left':
-        if (selectedCell.col > 0) {
-          setSelectedCell({ row: selectedCell.row, col: selectedCell.col - 1 });
-        }
-        break;
-      case 'right':
-        if (selectedCell.col < 8) {
-          setSelectedCell({ row: selectedCell.row, col: selectedCell.col + 1 });
-        }
-        break;
-      case 'up':
-        if (selectedCell.row > 0) {
-          setSelectedCell({ row: selectedCell.row - 1, col: selectedCell.col });
-        }
-        break;
-      case 'down':
-        if (selectedCell.row < 8) {
-          setSelectedCell({ row: selectedCell.row + 1, col: selectedCell.col });
-        }
-        break;
-    }
-  };
+  // Navigation is now handled through direct touch/click on cells
 
   // Check if selected cell is an original cell (provided at start)
   const isOriginalCell = selectedCell ? originalBoard[selectedCell.row][selectedCell.col] !== 0 : false;
@@ -167,76 +134,7 @@ export default function Controls() {
         })}
       </div>
 
-      {/* Control buttons */}
-      <div className="flex justify-center gap-2 mb-4">
-        <Button
-          variant={isNoteMode ? "default" : "outline"}
-          className={cn(
-            "gap-1",
-            isMobile ? "h-12 px-3" : ""
-          )}
-          onClick={toggleNoteMode}
-          disabled={!selectedCell || isOriginalCell}
-        >
-          <Pencil className={cn("h-4 w-4", isMobile ? "h-5 w-5" : "")} />
-          <span className={cn(isMobile ? "hidden sm:inline-block" : "")}>Notes</span>
-        </Button>
-        
-        <Button
-          variant="outline"
-          className={cn(
-            "gap-1",
-            isMobile ? "h-12 px-3" : ""
-          )}
-          onClick={() => selectedCell && clearCell(selectedCell.row, selectedCell.col)}
-          disabled={!selectedCell || isOriginalCell}
-        >
-          <Eraser className={cn("h-4 w-4", isMobile ? "h-5 w-5" : "")} />
-          <span className={cn(isMobile ? "hidden sm:inline-block" : "")}>Erase</span>
-        </Button>
-      </div>
-
-      {/* Arrow controls for mobile */}
-      {isMobile && (
-        <div className="grid grid-cols-3 gap-2 max-w-[150px] mx-auto">
-          <div className="col-start-2">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => handleArrowClick('up')}
-            >
-              <ChevronUp className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="col-start-1 col-end-2 row-start-2">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => handleArrowClick('left')}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="col-start-3 col-end-4 row-start-2">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => handleArrowClick('right')}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="col-start-2 row-start-3">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => handleArrowClick('down')}
-            >
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Control buttons (Hidden) */}
     </div>
   );
 }
