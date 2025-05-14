@@ -134,6 +134,20 @@ export default function SudokuGame() {
   }, [hasWon, stopTimer]);
 
   const handleNewGame = () => {
+    // 1. 이 난이도가 이미 완료된 경우 바로 리더보드로 이동
+    const { isDifficultyCompleted } = require('@/lib/sudoku/generator');
+    
+    if (isDifficultyCompleted(difficulty)) {
+      // 이미 완료된 난이도면 바로 리더보드 표시
+      generateNewGame(difficulty); // 오늘의 퍼즐 로드
+      setIsGameStarted(true);
+      setShowGameOver(true);
+      setShowLeaderboardForm(false);
+      setShowLeaderboard(true);
+      return;
+    }
+    
+    // 2. 새 게임 시작
     generateNewGame(difficulty);
     resetTimer();
     startTimer();
@@ -253,6 +267,11 @@ export default function SudokuGame() {
                       onSubmit={async (entry) => {
                         try {
                           await saveLeaderboardEntry(entry);
+                          
+                          // 레더보드에 등록된 난이도를 완료 처리 (하루에 한 번만 등록 가능)
+                          const { markDifficultyCompleted } = require('@/lib/sudoku/generator');
+                          markDifficultyCompleted(difficulty);
+                          
                           setShowLeaderboardForm(false);
                           setShowLeaderboard(true);
                         } catch (error) {
@@ -260,8 +279,11 @@ export default function SudokuGame() {
                         }
                       }}
                       onSkip={() => {
+                        // Skip 버튼 클릭 시 메인 페이지로 이동
                         setShowLeaderboardForm(false);
                         setShowGameOver(false);
+                        setIsGameStarted(false); // 메인 페이지로 이동
+                        resetTimer();
                       }}
                       difficulty={difficulty}
                       elapsedSeconds={elapsedSeconds}
@@ -279,11 +301,26 @@ export default function SudokuGame() {
                 <CardFooter className="flex justify-center gap-4">
                   {!showLeaderboardForm && (
                     <>
-                      <Button variant="outline" onClick={() => setShowGameOver(false)}>
-                        Continue
-                      </Button>
-                      <Button onClick={handleNewGame}>
-                        New Game
+                      {/* 리더보드가 보이는 경우 Continue 버튼 제거 */}
+                      {!showLeaderboard && (
+                        <Button variant="outline" onClick={() => setShowGameOver(false)}>
+                          Continue
+                        </Button>
+                      )}
+                      <Button 
+                        onClick={() => {
+                          // New Game 버튼은 리더보드에서 메인 페이지로 이동
+                          if (showLeaderboard) {
+                            setIsGameStarted(false);
+                            setShowGameOver(false);
+                            setShowLeaderboard(false);
+                            resetTimer();
+                          } else {
+                            handleNewGame();
+                          }
+                        }}
+                      >
+                        {showLeaderboard ? "Back to Main" : "New Game"}
                       </Button>
                       {hasWon && !showLeaderboard && (
                         <Button variant="secondary" onClick={() => setShowLeaderboard(true)}>
@@ -299,12 +336,22 @@ export default function SudokuGame() {
         </CardContent>
 
         {isGameStarted && (
-          <CardFooter className="flex justify-center gap-4 pt-2">
+          <CardFooter className="flex justify-center flex-wrap gap-4 pt-2">
             <Button variant="outline" onClick={handleCheckSolution}>
               <Check className="mr-2 h-4 w-4" /> Check Solution
             </Button>
             <Button variant="outline" onClick={handleResetGame}>
               <RefreshCw className="mr-2 h-4 w-4" /> Reset Board
+            </Button>
+            <Button 
+              variant="ghost" 
+              onClick={() => {
+                // 메인 페이지로 돌아가기
+                setIsGameStarted(false);
+                resetTimer();
+              }}
+            >
+              Back to Main
             </Button>
           </CardFooter>
         )}

@@ -14,6 +14,80 @@ function getGTMDate(): string {
   return `${now.getUTCFullYear()}-${now.getUTCMonth() + 1}-${now.getUTCDate()}`;
 }
 
+// 완료된 퍼즐 난이도 관리
+const COMPLETED_PUZZLES_KEY = 'sudoku-completed-puzzles';
+
+// 해당 날짜의 특정 난이도를 완료한 것으로 표시
+export function markDifficultyCompleted(difficulty: string): void {
+  try {
+    const today = getGTMDate();
+    const key = `${today}-${difficulty}`;
+    
+    // 기존 완료 목록 로드
+    let completed: Record<string, boolean> = {};
+    const saved = localStorage.getItem(COMPLETED_PUZZLES_KEY);
+    
+    if (saved) {
+      completed = JSON.parse(saved);
+    }
+    
+    // 오늘 날짜의 해당 난이도 완료 표시
+    completed[key] = true;
+    
+    // 저장
+    localStorage.setItem(COMPLETED_PUZZLES_KEY, JSON.stringify(completed));
+    console.log(`Marked ${difficulty} as completed for ${today}`);
+  } catch (err) {
+    console.error('Error marking difficulty as completed:', err);
+  }
+}
+
+// 해당 날짜의 특정 난이도가 이미 완료되었는지 확인
+export function isDifficultyCompleted(difficulty: string): boolean {
+  try {
+    const today = getGTMDate();
+    const key = `${today}-${difficulty}`;
+    
+    // 기존 완료 목록 로드
+    const saved = localStorage.getItem(COMPLETED_PUZZLES_KEY);
+    if (!saved) return false;
+    
+    const completed = JSON.parse(saved);
+    return !!completed[key];
+  } catch (err) {
+    console.error('Error checking if difficulty completed:', err);
+    return false;
+  }
+}
+
+// 해당 날짜의 모든 완료 기록 초기화 (숨겨진 기능용)
+export function resetCompletedPuzzles(): void {
+  try {
+    const today = getGTMDate();
+    
+    // 기존 완료 목록 로드
+    let completed: Record<string, boolean> = {};
+    const saved = localStorage.getItem(COMPLETED_PUZZLES_KEY);
+    
+    if (saved) {
+      completed = JSON.parse(saved);
+      
+      // 오늘 날짜로 시작하는 모든 키 제거
+      Object.keys(completed).forEach(key => {
+        if (key.startsWith(today)) {
+          delete completed[key];
+        }
+      });
+      
+      // 업데이트된 내용 저장
+      localStorage.setItem(COMPLETED_PUZZLES_KEY, JSON.stringify(completed));
+      console.log(`Reset all completed puzzles for ${today}`);
+    }
+  } catch (err) {
+    console.error('Error resetting completed puzzles:', err);
+  }
+}
+
 // 오늘의 날짜를 시드값으로 사용하는 간단한 난수 생성기
 function seededRandom(seed: string): () => number {
   let s = 0;
