@@ -30,13 +30,13 @@ export function generateSudokuPuzzle(difficulty: "easy" | "medium" | "hard" = "m
 function getDifficultyClues(difficulty: "easy" | "medium" | "hard"): number {
   switch (difficulty) {
     case "easy":
-      return 35; // More clues for easier puzzles
+      return 38; // 많은 힌트로 초보자도 쉽게 풀 수 있는 난이도 (38/81 cells filled)
     case "medium":
-      return 28;
+      return 30; // 적당한 도전이 있는 일반적인 난이도 (30/81 cells filled)
     case "hard":
-      return 23; // Fewer clues for harder puzzles
+      return 24; // 고급 기술이 필요한 어려운 난이도 (24/81 cells filled)
     default:
-      return 28;
+      return 30;
   }
 }
 

@@ -36,6 +36,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // 유저 IP 뒤 6자리 가져오기
+      const ip = req.ip || req.socket.remoteAddress || "unknown";
+      const lastSixDigits = ip.replace(/[^0-9]/g, '').slice(-6) || "000000";
+      
+      // 닉네임 뒤에 IP 추가 (있는 경우)
+      if (lastSixDigits !== "000000") {
+        parseResult.data.nickname = `${parseResult.data.nickname} #${lastSixDigits}`;
+      }
+      
       const entry = await storage.saveScore(parseResult.data);
       res.status(201).json(entry);
     } catch (error) {
