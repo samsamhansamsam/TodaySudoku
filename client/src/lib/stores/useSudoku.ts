@@ -292,15 +292,22 @@ export const useSudoku = create(
   }
 }), {
   name: "sudoku-storage", // 저장소 이름
-  partialize: (state) => ({ 
-    // 필요한 상태만 저장
-    board: state.board,
-    originalBoard: state.originalBoard,
-    difficulty: state.difficulty,
-    notes: state.notes,
-    elapsedSeconds: state.elapsedSeconds,
-    isComplete: state.isComplete,
-    hasWon: state.hasWon
-  }),
+  partialize: (state) => {
+    // 타입 어설션을 사용하여 Partial<SudokuState>로 취급
+    const savedState = {
+      board: state.board,
+      originalBoard: state.originalBoard,
+      solution: state.solution,
+      difficulty: state.difficulty,
+      selectedCell: state.selectedCell,
+      isNoteMode: state.isNoteMode,
+      notes: state.notes,
+      timerInterval: null, // 타이머는 초기화하여 저장
+      elapsedSeconds: state.elapsedSeconds,
+      isComplete: state.isComplete,
+      hasWon: state.hasWon
+    };
+    return savedState as Partial<SudokuState>;
+  },
 })
 );

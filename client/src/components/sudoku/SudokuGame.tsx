@@ -8,7 +8,8 @@ import { Leaderboard } from "./Leaderboard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Info, Check, RefreshCw, Volume2, VolumeX, Trophy } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { AlertCircle, Info, Check, RefreshCw, Volume2, VolumeX, Trophy, HelpCircle } from "lucide-react";
 import { useAudio } from "@/lib/stores/useAudio";
 import { LeaderboardEntry, saveLeaderboardEntry, getLeaderboard } from "@/lib/queryClient";
 
@@ -122,6 +123,27 @@ export default function SudokuGame() {
               <div className="text-center">
                 <h2 className="text-xl font-semibold mb-2">Welcome to Sudoku!</h2>
                 <p className="text-muted-foreground">Select a difficulty and start a new game</p>
+              </div>
+              
+              <div className="flex items-center gap-2 w-full max-w-md justify-center mb-2">
+                <h3 className="text-sm font-medium">Select Difficulty</h3>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full">
+                        <HelpCircle className="h-4 w-4" />
+                        <span className="sr-only">Difficulty info</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <div className="space-y-2 text-sm">
+                        <p><strong>Easy:</strong> 38/81 cells filled - For beginners, straightforward solving techniques.</p>
+                        <p><strong>Medium:</strong> 30/81 cells filled - Requires more deduction and moderate techniques.</p>
+                        <p><strong>Hard:</strong> 24/81 cells filled - Challenging puzzles requiring advanced techniques.</p>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
               
               <Tabs defaultValue="easy" className="w-full max-w-md" onValueChange={selectDifficulty}>
