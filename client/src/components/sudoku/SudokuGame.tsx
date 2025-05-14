@@ -66,11 +66,16 @@ export default function SudokuGame() {
     setHitSound(hitSfx);
     setSuccessSound(successSfx);
     
+    // 게임이 이미 시작된 상태라면 타이머 시작
+    if (isGameStarted) {
+      startTimer();
+    }
+    
     // Clean up on unmount
     return () => {
       stopTimer();
     };
-  }, []);
+  }, [setBackgroundMusic, setHitSound, setSuccessSound, isGameStarted, startTimer, stopTimer]);
   
   // 보드 상태 추적
   useEffect(() => {
