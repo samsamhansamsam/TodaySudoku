@@ -1,5 +1,16 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
+// 리더보드 관련 API 인터페이스
+export interface LeaderboardEntry {
+  id?: number;
+  nickname: string;
+  difficulty: "easy" | "medium" | "hard";
+  time_seconds: number;
+  puzzle_id: string;
+  board_snapshot: string;
+  completed_at?: Date;
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;

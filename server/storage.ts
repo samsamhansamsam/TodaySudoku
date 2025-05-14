@@ -1,4 +1,5 @@
-import { users, leaderboard, type User, type InsertUser, type Leaderboard, type InsertLeaderboard } from "@shared/schema";
+import * as schema from "@shared/schema";
+import { type User, type InsertUser, type Leaderboard, type InsertLeaderboard } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 import { db } from "./db";
 
