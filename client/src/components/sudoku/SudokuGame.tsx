@@ -76,7 +76,7 @@ export default function SudokuGame() {
   
   // 키보드 단축키 처리 함수 추가
   useEffect(() => {
-    // 시크릿 단축키: Alt+R을 누르면 로컬 스토리지 초기화
+    // 시크릿 단축키: Alt+R (로컬 스토리지 초기화), Alt+L (리더보드 완료 기록 초기화)
     const handleKeyDown = (e: KeyboardEvent) => {
       // Alt+R 단축키로 로컬 스토리지 초기화
       if (e.altKey && e.key === 'r') {
@@ -89,6 +89,18 @@ export default function SudokuGame() {
           window.location.reload();
         } catch (err) {
           console.error('Error clearing storage:', err);
+        }
+      }
+      
+      // Alt+L 단축키로 오늘의 리더보드 완료 기록 초기화
+      if (e.altKey && e.key === 'l') {
+        try {
+          const { resetCompletedPuzzles } = require('@/lib/sudoku/generator');
+          resetCompletedPuzzles();
+          console.log('Leaderboard completion status reset for today!');
+          alert('Leaderboard completion status has been reset for today. You can now submit scores for all difficulties again.');
+        } catch (err) {
+          console.error('Error resetting leaderboard completion status:', err);
         }
       }
     };
