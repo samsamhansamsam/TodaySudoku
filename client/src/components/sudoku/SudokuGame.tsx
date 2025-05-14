@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useSudoku } from "@/lib/stores/useSudoku";
 import SudokuBoard from "./SudokuBoard";
 import Controls from "./Controls";
