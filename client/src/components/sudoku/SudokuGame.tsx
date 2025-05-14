@@ -29,6 +29,9 @@ export default function SudokuGame() {
   
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
+  const [showLeaderboardForm, setShowLeaderboardForm] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [currentBoard, setCurrentBoard] = useState<number[][]>([[]]);
 
   // Initialize audio
   const { setBackgroundMusic, setHitSound, setSuccessSound, toggleMute, isMuted } = useAudio();
@@ -52,12 +55,20 @@ export default function SudokuGame() {
     };
   }, []);
   
+  // 보드 상태 추적
+  useEffect(() => {
+    // useSudoku 스토어의 board 값을 현재 컴포넌트 상태로 가져오기
+    const state = useSudoku.getState();
+    setCurrentBoard([...state.board]);
+  }, [isComplete]); // 게임 완료시 최종 보드 상태 저장
+
   useEffect(() => {
     if (hasWon) {
       stopTimer();
       setShowGameOver(true);
+      setShowLeaderboardForm(true);
     }
-  }, [hasWon]);
+  }, [hasWon, stopTimer]);
 
   const handleNewGame = () => {
     generateNewGame(difficulty);
@@ -65,6 +76,8 @@ export default function SudokuGame() {
     startTimer();
     setIsGameStarted(true);
     setShowGameOver(false);
+    setShowLeaderboardForm(false);
+    setShowLeaderboard(false);
   };
 
   const handleCheckSolution = () => {

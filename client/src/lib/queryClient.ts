@@ -66,3 +66,14 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+// 리더보드 API 함수
+export async function saveLeaderboardEntry(data: LeaderboardEntry) {
+  const response = await apiRequest("POST", "/api/leaderboard", data);
+  return await response.json();
+}
+
+export async function getLeaderboard(difficulty: string, limit = 10) {
+  const response = await apiRequest("GET", `/api/leaderboard/${difficulty}?limit=${limit}`);
+  return await response.json();
+}
