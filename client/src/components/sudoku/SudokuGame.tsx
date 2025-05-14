@@ -53,6 +53,7 @@ export default function SudokuGame() {
   // Initialize audio
   const { setBackgroundMusic, setHitSound, setSuccessSound, toggleMute, isMuted } = useAudio();
   
+  // 오디오 설정 - 일회성 작업이므로 의존성 배열을 비워둠
   useEffect(() => {
     // Setup audio elements
     const bgMusic = new Audio("/sounds/background.mp3");
@@ -66,16 +67,24 @@ export default function SudokuGame() {
     setHitSound(hitSfx);
     setSuccessSound(successSfx);
     
-    // 게임이 이미 시작된 상태라면 타이머 시작
+    // Clean up on unmount 
+    return () => {
+      // 컴포넌트 언마운트 시에만 타이머 정지
+      stopTimer();
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  
+  // 타이머 시작 - 단독 효과로 분리
+  useEffect(() => {
+    console.log("Timer effect running, isGameStarted:", isGameStarted);
+    // 게임이 시작된 상태라면 타이머 시작
     if (isGameStarted) {
+      console.log("Starting timer");
       startTimer();
     }
     
-    // Clean up on unmount
-    return () => {
-      stopTimer();
-    };
-  }, [setBackgroundMusic, setHitSound, setSuccessSound, isGameStarted, startTimer, stopTimer]);
+    // 의존성 배열에서 startTimer를 제거하여 무한 루프 방지
+  }, [isGameStarted]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // 보드 상태 추적
   useEffect(() => {
@@ -118,11 +127,8 @@ export default function SudokuGame() {
     <div className="w-full max-w-4xl px-4 py-8">
       <Card className="w-full">
         <CardHeader className="pb-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-            <div>
-              <CardTitle className="text-2xl font-bold">Sudoku Puzzle</CardTitle>
-              <CardDescription>Fill in the grid with numbers from 1-9</CardDescription>
-            </div>
+          <div className="flex flex-row justify-between items-center gap-2">
+            <CardTitle className="text-xl font-bold">Sudoku Puzzle</CardTitle>
             <div className="flex items-center gap-3">
               <Button 
                 variant="outline" 
@@ -261,15 +267,12 @@ export default function SudokuGame() {
         </CardContent>
 
         {isGameStarted && (
-          <CardFooter className="flex flex-wrap justify-center gap-3 pt-2">
+          <CardFooter className="flex justify-center gap-4 pt-2">
             <Button variant="outline" onClick={handleCheckSolution}>
               <Check className="mr-2 h-4 w-4" /> Check Solution
             </Button>
             <Button variant="outline" onClick={handleResetGame}>
               <RefreshCw className="mr-2 h-4 w-4" /> Reset Board
-            </Button>
-            <Button onClick={handleNewGame}>
-              New Game
             </Button>
           </CardFooter>
         )}
