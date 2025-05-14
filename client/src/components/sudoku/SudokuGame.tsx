@@ -137,9 +137,10 @@ export default function SudokuGame() {
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs">
                       <div className="space-y-2 text-sm">
-                        <p><strong>Easy:</strong> 38/81 cells filled - For beginners, straightforward solving techniques.</p>
+                        <p><strong>Easy:</strong> 40/81 cells filled - For beginners, straightforward solving techniques.</p>
                         <p><strong>Medium:</strong> 30/81 cells filled - Requires more deduction and moderate techniques.</p>
-                        <p><strong>Hard:</strong> 24/81 cells filled - Challenging puzzles requiring advanced techniques.</p>
+                        <p><strong>Hard:</strong> 20/81 cells filled - Challenging puzzles requiring advanced techniques.</p>
+                        <p className="text-xs italic mt-2">All puzzles have a unique solution that can be solved logically.</p>
                       </div>
                     </TooltipContent>
                   </Tooltip>

@@ -1,4 +1,4 @@
-import { solveBoard } from "./solver";
+import { solveBoard, hasUniqueSolution } from "./solver";
 
 // Generate a new Sudoku puzzle with the specified number of clues
 export function generateSudokuPuzzle(difficulty: "easy" | "medium" | "hard" = "medium"): number[][] {
@@ -12,15 +12,44 @@ export function generateSudokuPuzzle(difficulty: "easy" | "medium" | "hard" = "m
   const clues = getDifficultyClues(difficulty);
   
   // Create a copy to work with
-  const puzzle = solvedBoard.map(row => [...row]);
+  let puzzle = solvedBoard.map(row => [...row]);
   
   // Randomly remove numbers to create the puzzle
   const cells = shuffleArray(getAllCellPositions());
-  const totalCellsToRemove = 81 - clues;
   
-  for (let i = 0; i < totalCellsToRemove; i++) {
-    const [row, col] = cells[i];
-    puzzle[row][col] = 0;
+  // Try to create a puzzle with a unique solution
+  let attempts = 0;
+  let isUnique = false;
+  
+  while (!isUnique && attempts < 10) {
+    attempts++;
+    
+    // Reset the puzzle
+    puzzle = solvedBoard.map(row => [...row]);
+    
+    // Cells to keep (clues)
+    const cellsToKeep = cells.slice(0, clues);
+    const cellsToKeepSet = new Set(cellsToKeep.map(([row, col]) => `${row},${col}`));
+    
+    // Remove all cells except the ones to keep
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
+        if (!cellsToKeepSet.has(`${row},${col}`)) {
+          puzzle[row][col] = 0;
+        }
+      }
+    }
+    
+    // Check if the puzzle has a unique solution
+    isUnique = hasUniqueSolution(puzzle);
+    
+    // If we've found a unique solution or we're out of attempts, exit the loop
+    if (isUnique || attempts >= 10) {
+      if (!isUnique && attempts >= 10) {
+        console.warn("Could not generate a puzzle with a unique solution after multiple attempts");
+      }
+      break;
+    }
   }
   
   return puzzle;
@@ -30,11 +59,11 @@ export function generateSudokuPuzzle(difficulty: "easy" | "medium" | "hard" = "m
 function getDifficultyClues(difficulty: "easy" | "medium" | "hard"): number {
   switch (difficulty) {
     case "easy":
-      return 38; // 많은 힌트로 초보자도 쉽게 풀 수 있는 난이도 (38/81 cells filled)
+      return 40; // 많은 힌트로 초보자도 쉽게 풀 수 있는 난이도 (40/81 cells filled)
     case "medium":
       return 30; // 적당한 도전이 있는 일반적인 난이도 (30/81 cells filled)
     case "hard":
-      return 24; // 고급 기술이 필요한 어려운 난이도 (24/81 cells filled)
+      return 20; // 고급 기술이 필요한 어려운 난이도 (20/81 cells filled)
     default:
       return 30;
   }
