@@ -164,13 +164,52 @@ export default function SudokuGame() {
                       : "The puzzle is still incomplete or has errors."}
                   </CardDescription>
                 </CardHeader>
+                
+                {showLeaderboardForm && hasWon && (
+                  <CardContent>
+                    <LeaderboardForm 
+                      onSubmit={async (entry) => {
+                        try {
+                          await saveLeaderboardEntry(entry);
+                          setShowLeaderboardForm(false);
+                          setShowLeaderboard(true);
+                        } catch (error) {
+                          console.error("Error saving score:", error);
+                        }
+                      }}
+                      onSkip={() => {
+                        setShowLeaderboardForm(false);
+                        setShowGameOver(false);
+                      }}
+                      difficulty={difficulty}
+                      elapsedSeconds={elapsedSeconds}
+                      board={currentBoard}
+                    />
+                  </CardContent>
+                )}
+                
+                {showLeaderboard && (
+                  <CardContent>
+                    <Leaderboard getLeaderboard={(difficulty) => getLeaderboard(difficulty)} />
+                  </CardContent>
+                )}
+                
                 <CardFooter className="flex justify-center gap-4">
-                  <Button variant="outline" onClick={() => setShowGameOver(false)}>
-                    Continue
-                  </Button>
-                  <Button onClick={handleNewGame}>
-                    New Game
-                  </Button>
+                  {!showLeaderboardForm && (
+                    <>
+                      <Button variant="outline" onClick={() => setShowGameOver(false)}>
+                        Continue
+                      </Button>
+                      <Button onClick={handleNewGame}>
+                        New Game
+                      </Button>
+                      {hasWon && !showLeaderboard && (
+                        <Button variant="secondary" onClick={() => setShowLeaderboard(true)}>
+                          <Trophy className="mr-2 h-4 w-4" /> Leaderboard
+                        </Button>
+                      )}
+                    </>
+                  )}
                 </CardFooter>
               </Card>
             </div>

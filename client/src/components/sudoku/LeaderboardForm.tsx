@@ -55,8 +55,8 @@ export function LeaderboardForm({
       
       await onSubmit(entry);
     } catch (err) {
-      console.error("리더보드 제출 오류:", err);
-      setError("점수 저장 중 오류가 발생했습니다. 다시 시도해주세요.");
+      console.error("Leaderboard submission error:", err);
+      setError("An error occurred while saving your score. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
