@@ -171,22 +171,28 @@ export default function Controls() {
       <div className="flex justify-center gap-2 mb-4">
         <Button
           variant={isNoteMode ? "default" : "outline"}
-          className="gap-1"
+          className={cn(
+            "gap-1",
+            isMobile ? "h-12 px-3" : ""
+          )}
           onClick={toggleNoteMode}
           disabled={!selectedCell || isOriginalCell}
         >
-          <Pencil className="h-4 w-4" />
-          <span className={cn(isMobile ? "hidden" : "")}>Notes</span>
+          <Pencil className={cn("h-4 w-4", isMobile ? "h-5 w-5" : "")} />
+          <span className={cn(isMobile ? "hidden sm:inline-block" : "")}>Notes</span>
         </Button>
         
         <Button
           variant="outline"
-          className="gap-1"
+          className={cn(
+            "gap-1",
+            isMobile ? "h-12 px-3" : ""
+          )}
           onClick={() => selectedCell && clearCell(selectedCell.row, selectedCell.col)}
           disabled={!selectedCell || isOriginalCell}
         >
-          <Eraser className="h-4 w-4" />
-          <span className={cn(isMobile ? "hidden" : "")}>Erase</span>
+          <Eraser className={cn("h-4 w-4", isMobile ? "h-5 w-5" : "")} />
+          <span className={cn(isMobile ? "hidden sm:inline-block" : "")}>Erase</span>
         </Button>
       </div>
 
