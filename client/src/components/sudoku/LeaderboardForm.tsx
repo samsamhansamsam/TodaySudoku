@@ -60,14 +60,12 @@ export function LeaderboardForm({
       console.error("Leaderboard submission error:", err);
       
       // 서버로부터 받은 오류 메시지 처리
-      if (err.response && err.response.data) {
-        // 중복 제출 오류 처리
-        if (err.response.status === 400 && err.response.data.error === "Duplicate submission") {
-          setError(err.response.data.message || "You've already submitted a score for this difficulty level today.");
-        } else {
-          // 기타 서버 오류
-          setError(err.response.data.message || "An error occurred while saving your score.");
-        }
+      if (err && err.message && err.message.includes('400')) {
+        // 중복 제출 오류 처리 가능성이 높음
+        setError(t("You've already submitted a score for this difficulty level today."));
+      } else if (err && err.message) {
+        // 기타 서버 오류 - 메시지가 있는 경우
+        setError(err.message);
       } else {
         // 기타 네트워크 오류
         setError(t("An error occurred while saving your score. Please try again."));

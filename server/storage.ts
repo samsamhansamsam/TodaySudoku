@@ -151,9 +151,20 @@ export class DbStorage implements IStorage {
   }
 
   async saveScore(score: InsertLeaderboard): Promise<Leaderboard> {
+    // completed_at이 제공되지 않았다면 현재 시간으로 설정
+    if (!score.completed_at) {
+      score.completed_at = new Date();
+    }
+    
+    // ip_address가 null이 될 수 있도록 타입 처리
+    const scoreToInsert = {
+      ...score,
+      ip_address: score.ip_address || null
+    };
+    
     const result = await db
       .insert(schema.leaderboard)
-      .values(score)
+      .values(scoreToInsert)
       .returning();
     return result[0];
   }
