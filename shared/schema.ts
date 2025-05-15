@@ -33,6 +33,7 @@ export const insertLeaderboardSchema = createInsertSchema(leaderboard).pick({
   time_seconds: true,
   puzzle_id: true,
   board_snapshot: true,
+  completed_at: true,
 });
 
 export type InsertLeaderboard = z.infer<typeof insertLeaderboardSchema>;

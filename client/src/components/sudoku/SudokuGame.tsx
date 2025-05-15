@@ -82,6 +82,8 @@ export default function SudokuGame() {
   const [showLeaderboardForm, setShowLeaderboardForm] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [currentBoard, setCurrentBoard] = useState<number[][]>([[]]);
+  // 사용자가 선택한 난이도 추적
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
 
   // 컴포넌트 언마운트 시 정리 작업
   useEffect(() => {
@@ -164,8 +166,11 @@ export default function SudokuGame() {
   }, [hasWon, stopTimer]);
 
   const handleNewGame = () => {
-    // 사용자가 난이도를 명시적으로 선택하지 않았다면 easy로 설정
-    const currentDifficulty = difficulty || "easy";
+    // 선택한 난이도가 없으면 실행하지 않음
+    if (!selectedDifficulty) return;
+    
+    // 선택한 난이도 적용
+    const currentDifficulty = selectedDifficulty as "easy" | "medium" | "hard";
     setDifficulty(currentDifficulty);
     
     // 1. 이 난이도가 이미 완료된 경우 바로 리더보드로 이동
@@ -198,7 +203,7 @@ export default function SudokuGame() {
   };
 
   const selectDifficulty = (diff: string) => {
-    setDifficulty(diff as "easy" | "medium" | "hard");
+    setSelectedDifficulty(diff);
   };
 
   const memoizedGetLeaderboard = useCallback(
@@ -271,9 +276,9 @@ export default function SudokuGame() {
               </div>
 
               <Tabs
-                defaultValue="easy"
                 className="w-full max-w-md"
                 onValueChange={selectDifficulty}
+                value={selectedDifficulty || undefined}
               >
                 <TabsList className="grid grid-cols-3">
                   <TabsTrigger value="easy">Easy</TabsTrigger>
@@ -282,7 +287,11 @@ export default function SudokuGame() {
                 </TabsList>
               </Tabs>
 
-              <Button size="lg" onClick={handleNewGame}>
+              <Button 
+                size="lg" 
+                onClick={handleNewGame} 
+                disabled={!selectedDifficulty}
+              >
                 Start New Game
               </Button>
 
