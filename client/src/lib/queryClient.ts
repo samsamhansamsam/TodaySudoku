@@ -82,14 +82,24 @@ export async function saveLeaderboardEntry(data: LeaderboardEntry) {
 }
 
 export async function getLeaderboard(difficulty: string, limit = 10, date?: Date) {
-  let url = `/api/leaderboard/${difficulty}?limit=${limit}`;
+  // 날짜가 제공되지 않으면 현재 날짜 사용
+  const selectedDate = date || new Date();
   
-  // 날짜 파라미터가 있으면 추가 (Server는 날짜별 필터링은 구현하지 않아도 됨)
-  if (date) {
-    const dateStr = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
-    url += `&date=${dateStr}`;
+  // ISO 형식으로 날짜를 변환 (YYYY-MM-DD)
+  const dateStr = `${selectedDate.getUTCFullYear()}-${String(selectedDate.getUTCMonth() + 1).padStart(2, '0')}-${String(selectedDate.getUTCDate()).padStart(2, '0')}`;
+  
+  // 쿼리 파라미터를 포함한 URL 구성
+  const url = `/api/leaderboard/${difficulty}?limit=${limit}&date=${dateStr}`;
+  
+  console.log(`Fetching leaderboard for ${difficulty} difficulty on ${dateStr}`);
+  
+  try {
+    const response = await apiRequest("GET", url);
+    const data = await response.json();
+    console.log(`Received ${data.length} leaderboard entries`);
+    return data;
+  } catch (error) {
+    console.error(`Error fetching leaderboard: ${error}`);
+    throw error;
   }
-  
-  const response = await apiRequest("GET", url);
-  return await response.json();
 }

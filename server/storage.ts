@@ -67,8 +67,18 @@ export class MemStorage implements IStorage {
     limit?: number;
     date: string;
   }): Promise<Leaderboard[]> {
+    // 정확한 날짜 매칭을 위해 YYYY-MM-DD 포맷 확인
+    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+    if (!datePattern.test(date)) {
+      console.error("Invalid date format provided:", date);
+      return [];
+    }
+    
+    // 완전히 정확한 날짜 매칭을 위해 puzzle_id가 'YYYY-MM-DD-difficulty'로 시작하는 항목 필터링
     const puzzleIdPrefix = `${date}-${difficulty}`;
-    return this.leaderboards
+    console.log(`[MemStorage] Filtering leaderboard with prefix: ${puzzleIdPrefix}`);
+    
+    const result = this.leaderboards
       .filter(
         (entry) =>
           entry.difficulty === difficulty &&
@@ -76,12 +86,23 @@ export class MemStorage implements IStorage {
       )
       .sort((a, b) => a.time_seconds - b.time_seconds)
       .slice(0, limit);
+      
+    console.log(`[MemStorage] Found ${result.length} entries for ${puzzleIdPrefix}`);
+    return result;
   }
 
   async saveScore(score: InsertLeaderboard): Promise<Leaderboard> {
     const id = this.currentLeaderboardId++;
-    const completed_at = new Date();
-    const entry = { ...score, id, completed_at };
+    const completed_at = score.completed_at || new Date();
+    
+    // ip_address가 null이 될 수 있도록 타입 처리
+    const entry: Leaderboard = {
+      ...score,
+      id,
+      completed_at,
+      ip_address: score.ip_address || null
+    };
+    
     this.leaderboards.push(entry);
     return entry;
   }
@@ -135,18 +156,32 @@ export class DbStorage implements IStorage {
     limit?: number;
     date: string;
   }): Promise<Leaderboard[]> {
+    // 정확한 날짜 매칭을 위해 YYYY-MM-DD 포맷 확인
+    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+    if (!datePattern.test(date)) {
+      console.error("Invalid date format provided:", date);
+      return [];
+    }
+    
+    // 완전히 정확한 날짜 매칭을 위해 puzzle_id가 'YYYY-MM-DD-difficulty-'로 시작하는 항목 필터링
     const puzzleIdPrefix = `${date}-${difficulty}`;
+    
+    console.log(`Filtering leaderboard with prefix: ${puzzleIdPrefix}`);
+    
     const results = await db
       .select()
       .from(schema.leaderboard)
       .where(
         and(
           eq(schema.leaderboard.difficulty, difficulty),
+          // 정확한 날짜 매칭을 위해 like에 날짜-난이도 패턴 사용
           like(schema.leaderboard.puzzle_id, `${puzzleIdPrefix}%`),
         ),
       )
       .orderBy(schema.leaderboard.time_seconds)
       .limit(limit);
+      
+    console.log(`Found ${results.length} entries for ${puzzleIdPrefix}`);
     return results;
   }
 

@@ -51,12 +51,22 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
         // 선택한 날짜와 난이도에 따라 데이터 가져오기
         const data = await getLeaderboard(activeTab, 10, selectedDate);
 
-        // 날짜별 필터링은 클라이언트에서도 처리 (API에서 필터링이 제대로 안될 경우를 대비)
+        // 서버에서 이미 날짜별로 필터링된 데이터를 받지만, 
+        // 추가적인 안전장치로 클라이언트에서도 필터링 수행
         const datePrefix = getDatePrefix(selectedDate);
-        const filteredData = data.filter((entry) =>
-          entry.puzzle_id.startsWith(`${datePrefix}-${activeTab}`),
+        const expectedPrefix = `${datePrefix}-${activeTab}`;
+        
+        // 필터링 전후 데이터 수 비교를 위한 로그
+        console.log(`서버로부터 받은 데이터: ${data.length}개`);
+        
+        // 이중 체크를 통한 필터링
+        const filteredData = data.filter((entry) => 
+          entry.puzzle_id.startsWith(expectedPrefix)
         );
-
+        
+        console.log(`필터링 후 데이터: ${filteredData.length}개 (prefix: ${expectedPrefix})`);
+        
+        // 최종 필터링된 데이터를 상태에 설정
         setEntries(filteredData);
       } catch (err) {
         console.error("Failed to load leaderboard:", err);
