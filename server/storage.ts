@@ -157,6 +157,21 @@ export class DbStorage implements IStorage {
       .returning();
     return result[0];
   }
+
+  async checkDuplicateSubmission(ip: string, dateStr: string, difficulty: string): Promise<Leaderboard[]> {
+    const puzzleIdPrefix = `${dateStr}-${difficulty}`;
+    const results = await db
+      .select()
+      .from(schema.leaderboard)
+      .where(
+        and(
+          eq(schema.leaderboard.difficulty, difficulty),
+          like(schema.leaderboard.puzzle_id, `${puzzleIdPrefix}%`),
+          eq(schema.leaderboard.ip_address, ip)
+        )
+      );
+    return results;
+  }
 }
 
 // 👉 여기만 바꾸면 메모리 vs DB 선택 가능
