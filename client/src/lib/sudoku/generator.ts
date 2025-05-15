@@ -236,13 +236,13 @@ export function generateSudokuPuzzle(difficulty: "easy" | "medium" | "hard" = "m
 function getDifficultyClues(difficulty: "easy" | "medium" | "hard"): number {
   switch (difficulty) {
     case "easy":
-      return 70; // 요청에 따라 70개 셀이 공개됨 (70/81 - 약 86%)
+      return 50; // 쉬운 난이도 - 50개 셀이 공개됨 (50/81 - 약 62%)
     case "medium":
-      return 30; // 적당한 도전이 있는 일반적인 난이도 (30/81 cells filled)
+      return 35; // 중간 난이도 - 35개 셀이 공개됨 (35/81 - 약 43%)
     case "hard":
-      return 20; // 고급 기술이 필요한 어려운 난이도 (20/81 cells filled)
+      return 20; // 어려운 난이도 - 20개 셀이 공개됨 (20/81 - 약 25%)
     default:
-      return 30;
+      return 35;
   }
 }
 

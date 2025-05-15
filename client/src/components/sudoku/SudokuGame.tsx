@@ -254,11 +254,11 @@ export default function SudokuGame() {
                     <TooltipContent className="max-w-xs">
                       <div className="space-y-2 text-sm">
                         <p>
-                          <strong>Easy:</strong> 40/81 cells filled - For
+                          <strong>Easy:</strong> 50/81 cells filled - For
                           beginners, straightforward solving techniques.
                         </p>
                         <p>
-                          <strong>Medium:</strong> 30/81 cells filled - Requires
+                          <strong>Medium:</strong> 35/81 cells filled - Requires
                           more deduction and moderate techniques.
                         </p>
                         <p>

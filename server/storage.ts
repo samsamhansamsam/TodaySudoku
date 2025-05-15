@@ -1,21 +1,30 @@
 import * as schema from "@shared/schema";
-import { type User, type InsertUser, type Leaderboard, type InsertLeaderboard } from "@shared/schema";
-import { eq, desc, asc, sql } from "drizzle-orm";
+import {
+  type User,
+  type InsertUser,
+  type Leaderboard,
+  type InsertLeaderboard,
+} from "@shared/schema";
+import { eq, and, like } from "drizzle-orm";
 import { db } from "./db";
 
-// modify the interface with any CRUD methods
-// you might need
-
+// 스토리지 인터페이스 정의
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
-  // 리더보드 관련 메서드
-  getLeaderboard(difficulty: string, limit?: number): Promise<Leaderboard[]>;
+
+  // 날짜 기반 유연 필터링을 위한 시그니처
+  getLeaderboard(params: {
+    difficulty: string;
+    limit?: number;
+    date: string;
+  }): Promise<Leaderboard[]>;
+
   saveScore(score: InsertLeaderboard): Promise<Leaderboard>;
 }
 
+// ---------- 메모리 스토리지 ---------- //
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private leaderboards: Leaderboard[];
@@ -45,22 +54,27 @@ export class MemStorage implements IStorage {
     this.users.set(id, user);
     return user;
   }
-  
-  async getLeaderboard(difficulty: string, limit: number = 10): Promise<Leaderboard[]> {
-    // Get current date in UTC for puzzle_id filtering
-    const today = new Date();
-    const dateKey = `${today.getUTCFullYear()}-${today.getUTCMonth() + 1}-${today.getUTCDate()}`;
-    const puzzleIdPrefix = `${dateKey}-${difficulty}`;
-    
+
+  async getLeaderboard({
+    difficulty,
+    limit = 10,
+    date,
+  }: {
+    difficulty: string;
+    limit?: number;
+    date: string;
+  }): Promise<Leaderboard[]> {
+    const puzzleIdPrefix = `${date}-${difficulty}`;
     return this.leaderboards
-      .filter(entry => 
-        entry.difficulty === difficulty && 
-        entry.puzzle_id.startsWith(puzzleIdPrefix)
+      .filter(
+        (entry) =>
+          entry.difficulty === difficulty &&
+          entry.puzzle_id.startsWith(puzzleIdPrefix),
       )
-      .sort((a, b) => a.time_seconds - b.time_seconds) // 가장 빠른 시간이 상위에 오도록 정렬
+      .sort((a, b) => a.time_seconds - b.time_seconds)
       .slice(0, limit);
   }
-  
+
   async saveScore(score: InsertLeaderboard): Promise<Leaderboard> {
     const id = this.currentLeaderboardId++;
     const completed_at = new Date();
@@ -70,6 +84,7 @@ export class MemStorage implements IStorage {
   }
 }
 
+// ---------- 실제 DB 스토리지 ---------- //
 export class DbStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
     const users = await db
@@ -97,28 +112,31 @@ export class DbStorage implements IStorage {
     const userId = result[0].id;
     return { ...user, id: userId };
   }
-  
-  async getLeaderboard(difficulty: string, limit: number = 10): Promise<Leaderboard[]> {
-    // Get current date in UTC for puzzle_id filtering
-    const today = new Date();
-    const dateKey = `${today.getUTCFullYear()}-${today.getUTCMonth() + 1}-${today.getUTCDate()}`;
-    const puzzleIdPrefix = `${dateKey}-${difficulty}`;
-    
-    // Get all entries first
-    const entries = await db
+
+  async getLeaderboard({
+    difficulty,
+    limit = 10,
+    date,
+  }: {
+    difficulty: string;
+    limit?: number;
+    date: string;
+  }): Promise<Leaderboard[]> {
+    const puzzleIdPrefix = `${date}-${difficulty}`;
+    const results = await db
       .select()
-      .from(schema.leaderboard);
-      
-    // Then filter and sort in memory (JS)
-    return entries
-      .filter(entry => 
-        entry.difficulty === difficulty && 
-        entry.puzzle_id.startsWith(puzzleIdPrefix)
+      .from(schema.leaderboard)
+      .where(
+        and(
+          eq(schema.leaderboard.difficulty, difficulty),
+          like(schema.leaderboard.puzzle_id, `${puzzleIdPrefix}%`),
+        ),
       )
-      .sort((a, b) => a.time_seconds - b.time_seconds)
-      .slice(0, limit);
+      .orderBy(schema.leaderboard.time_seconds)
+      .limit(limit);
+    return results;
   }
-  
+
   async saveScore(score: InsertLeaderboard): Promise<Leaderboard> {
     const result = await db
       .insert(schema.leaderboard)
@@ -128,5 +146,6 @@ export class DbStorage implements IStorage {
   }
 }
 
-// 메모리 스토리지 사용 (나중에 DB로 전환할 수 있음)
-export const storage = new MemStorage();
+// 👉 여기만 바꾸면 메모리 vs DB 선택 가능
+export const storage: IStorage = new DbStorage();
+// export const storage: IStorage = new MemStorage();
