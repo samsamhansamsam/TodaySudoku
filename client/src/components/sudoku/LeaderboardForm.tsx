@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Trophy, Loader2 } from "lucide-react";
 import { useSudoku } from "@/lib/stores/useSudoku";
+import { useLanguage } from "@/lib/stores/useLanguage";
 import { LeaderboardEntry } from "@/lib/queryClient";
 import { createHash } from "crypto";
 
@@ -22,6 +23,7 @@ export function LeaderboardForm({
   elapsedSeconds,
   board,
 }: LeaderboardFormProps) {
+  const { t } = useLanguage();
   const [nickname, setNickname] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -30,7 +32,7 @@ export function LeaderboardForm({
     e.preventDefault();
 
     if (!nickname.trim()) {
-      setError("Please enter a nickname.");
+      setError(t("Please enter a nickname."));
       return;
     }
 
@@ -68,7 +70,7 @@ export function LeaderboardForm({
         }
       } else {
         // 기타 네트워크 오류
-        setError("An error occurred while saving your score. Please try again.");
+        setError(t("An error occurred while saving your score. Please try again."));
       }
     } finally {
       setIsSubmitting(false);
@@ -79,21 +81,20 @@ export function LeaderboardForm({
     <div className="p-4 bg-white rounded-lg shadow-md">
       <div className="flex items-center gap-2 mb-4">
         <Trophy className="h-5 w-5 text-yellow-500" />
-        <h2 className="text-lg font-semibold">Add to Leaderboard</h2>
+        <h2 className="text-lg font-semibold">{t("Add to Leaderboard")}</h2>
       </div>
 
       <p className="text-sm text-gray-500 mb-4">
-        Congratulations! You've completed the {difficulty} puzzle in{" "}
-        {Math.floor(elapsedSeconds / 60)}m {elapsedSeconds % 60}s. Enter your
-        nickname to save your score to the leaderboard.
+        {t("Congratulations! You've completed the")} {t(difficulty)} {t("puzzle in")}{" "}
+        {Math.floor(elapsedSeconds / 60)}m {elapsedSeconds % 60}s. {t("Enter your nickname to save your score to the leaderboard.")}
       </p>
 
       <form onSubmit={handleSubmit}>
         <div className="space-y-2 mb-4">
-          <Label htmlFor="nickname">Nickname</Label>
+          <Label htmlFor="nickname">{t("Nickname")}</Label>
           <Input
             id="nickname"
-            placeholder="Enter your nickname"
+            placeholder={t("Enter your nickname")}
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
             maxLength={50}
@@ -109,11 +110,11 @@ export function LeaderboardForm({
             onClick={onSkip}
             disabled={isSubmitting}
           >
-            Skip
+            {t("Skip")}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Submit
+            {t("Submit")}
           </Button>
         </div>
       </form>

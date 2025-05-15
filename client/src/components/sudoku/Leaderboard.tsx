@@ -17,6 +17,7 @@ import {
   RefreshCw,
   Calendar as CalendarIcon,
 } from "lucide-react";
+import { useLanguage } from "@/lib/stores/useLanguage";
 
 interface LeaderboardProps {
   getLeaderboard: (difficulty: string) => Promise<LeaderboardEntry[]>;
