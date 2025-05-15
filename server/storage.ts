@@ -22,6 +22,9 @@ export interface IStorage {
   }): Promise<Leaderboard[]>;
 
   saveScore(score: InsertLeaderboard): Promise<Leaderboard>;
+  
+  // 중복 제출 확인 (같은 IP, 날짜, 난이도 조합)
+  checkDuplicateSubmission(ip: string, dateStr: string, difficulty: string): Promise<Leaderboard[]>;
 }
 
 // ---------- 메모리 스토리지 ---------- //
@@ -81,6 +84,16 @@ export class MemStorage implements IStorage {
     const entry = { ...score, id, completed_at };
     this.leaderboards.push(entry);
     return entry;
+  }
+  
+  async checkDuplicateSubmission(ip: string, dateStr: string, difficulty: string): Promise<Leaderboard[]> {
+    const puzzleIdPrefix = `${dateStr}-${difficulty}`;
+    return this.leaderboards.filter(
+      (entry) => 
+        entry.difficulty === difficulty && 
+        entry.puzzle_id.startsWith(puzzleIdPrefix) &&
+        entry.ip_address === ip
+    );
   }
 }
 
