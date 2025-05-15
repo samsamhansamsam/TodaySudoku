@@ -42,6 +42,9 @@ const koStrings: Record<string, string> = {
   'Note Mode': '메모 모드',
   'Notes': '메모',
   'Clear': '지우기',
+  'Check Solution': '정답 확인',
+  'Reset Board': '보드 초기화',
+  'Back to Main': '메인으로 돌아가기',
   
   // 게임 종료
   'Congratulations!': '축하합니다!',
