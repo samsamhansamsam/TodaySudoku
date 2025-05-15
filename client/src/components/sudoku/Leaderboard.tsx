@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { LeaderboardEntry } from "@/lib/queryClient";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Medal, Clock, RefreshCw } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { Loader2, Medal, Clock, RefreshCw, Calendar as CalendarIcon } from "lucide-react";
 
 interface LeaderboardProps {
   getLeaderboard: (difficulty: string) => Promise<LeaderboardEntry[]>;
@@ -13,15 +17,31 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  
+  // 선택된 날짜로 퍼즐 ID 접두사 생성
+  const getDatePrefix = (date: Date) => {
+    return `${date.getUTCFullYear()}-${(date.getUTCMonth() + 1).toString().padStart(2, '0')}-${date.getUTCDate().toString().padStart(2, '0')}`;
+  };
   
   useEffect(() => {
     const fetchLeaderboard = async () => {
+      if (!selectedDate) return;
+      
       setLoading(true);
       setError("");
       
       try {
-        const data = await getLeaderboard(activeTab);
-        setEntries(data);
+        // 선택한 날짜와 난이도에 따라 데이터 가져오기
+        const data = await getLeaderboard(activeTab, 10, selectedDate);
+        
+        // 날짜별 필터링은 클라이언트에서도 처리 (API에서 필터링이 제대로 안될 경우를 대비)
+        const datePrefix = getDatePrefix(selectedDate);
+        const filteredData = data.filter(entry => 
+          entry.puzzle_id.startsWith(`${datePrefix}-${activeTab}`)
+        );
+        
+        setEntries(filteredData);
       } catch (err) {
         console.error("Failed to load leaderboard:", err);
         setError("Failed to load the leaderboard. Please try again.");
@@ -31,7 +51,7 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
     };
     
     fetchLeaderboard();
-  }, [activeTab, getLeaderboard]);
+  }, [activeTab, selectedDate, getLeaderboard]);
   
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -45,8 +65,28 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
     return date.toLocaleDateString();
   };
   
+  // 선택된 날짜가 오늘인지 확인
+  const isToday = (date: Date | undefined): boolean => {
+    if (!date) return false;
+    const today = new Date();
+    return (
+      date.getUTCFullYear() === today.getUTCFullYear() &&
+      date.getUTCMonth() === today.getUTCMonth() &&
+      date.getUTCDate() === today.getUTCDate()
+    );
+  };
+  
   // 다음 재설정까지 남은 시간 계산
   const getRemainingTimeUntilReset = () => {
+    // 선택된 날짜가 오늘인 경우에만 카운트다운 표시
+    if (!selectedDate || !isToday(selectedDate)) {
+      return (
+        <div className="text-center text-sm">
+          Showing historical data for {selectedDate ? format(selectedDate, 'PPP') : ''}
+        </div>
+      );
+    }
+    
     const now = new Date();
     const tomorrow = new Date();
     tomorrow.setUTCHours(24, 0, 0, 0); // 다음날 UTC 자정
@@ -67,8 +107,30 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
     <Card>
       <CardHeader>
         <CardTitle className="text-center">Leaderboard</CardTitle>
-        <div className="text-center text-muted-foreground text-sm mt-1">
-          Daily puzzle for {new Date().toLocaleDateString()}
+        <div className="flex items-center justify-center gap-2 text-center mt-1">
+          <div className="text-muted-foreground text-sm">
+            Daily puzzle for
+          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 justify-start font-normal"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="center">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
         </div>
       </CardHeader>
       
@@ -128,8 +190,14 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
                   </tbody>
                 </table>
                 <div className="mt-4 pt-2 text-center text-sm text-muted-foreground border-t">
-                  <div>Leaderboard resets at midnight UTC</div>
-                  <div>{getRemainingTimeUntilReset()}</div>
+                  {isToday(selectedDate) ? (
+                    <>
+                      <div>Leaderboard resets at midnight UTC</div>
+                      <div>{getRemainingTimeUntilReset()}</div>
+                    </>
+                  ) : (
+                    <div>{getRemainingTimeUntilReset()}</div>
+                  )}
                 </div>
               </div>
             )}

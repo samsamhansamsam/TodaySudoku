@@ -81,10 +81,15 @@ export async function saveLeaderboardEntry(data: LeaderboardEntry) {
   }
 }
 
-export async function getLeaderboard(difficulty: string, limit = 10) {
-  const response = await apiRequest(
-    "GET",
-    `/api/leaderboard/${difficulty}?limit=${limit}`,
-  );
+export async function getLeaderboard(difficulty: string, limit = 10, date?: Date) {
+  let url = `/api/leaderboard/${difficulty}?limit=${limit}`;
+  
+  // 날짜 파라미터가 있으면 추가 (Server는 날짜별 필터링은 구현하지 않아도 됨)
+  if (date) {
+    const dateStr = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+    url += `&date=${dateStr}`;
+  }
+  
+  const response = await apiRequest("GET", url);
   return await response.json();
 }
