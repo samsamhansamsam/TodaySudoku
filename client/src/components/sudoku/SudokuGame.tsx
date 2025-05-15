@@ -244,8 +244,8 @@ export default function SudokuGame() {
     setSelectedDifficulty(diff);
   };
 
-  const memoizedGetLeaderboard = useCallback((difficulty: string) => {
-    return getLeaderboard(difficulty as "easy" | "medium" | "hard");
+  const memoizedGetLeaderboard = useCallback((difficulty: string, limit = 10, date?: Date) => {
+    return getLeaderboard(difficulty as "easy" | "medium" | "hard", limit, date);
   }, []);
 
   return (

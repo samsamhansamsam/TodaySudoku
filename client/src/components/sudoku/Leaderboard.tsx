@@ -20,7 +20,7 @@ import {
 import { useLanguage } from "@/lib/stores/useLanguage";
 
 interface LeaderboardProps {
-  getLeaderboard: (difficulty: string) => Promise<LeaderboardEntry[]>;
+  getLeaderboard: (difficulty: string, limit?: number, date?: Date) => Promise<LeaderboardEntry[]>;
 }
 
 export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
@@ -49,7 +49,7 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
 
       try {
         // 선택한 날짜와 난이도에 따라 데이터 가져오기
-        const data = await getLeaderboard(activeTab);
+        const data = await getLeaderboard(activeTab, 10, selectedDate);
 
         // 날짜별 필터링은 클라이언트에서도 처리 (API에서 필터링이 제대로 안될 경우를 대비)
         const datePrefix = getDatePrefix(selectedDate);
