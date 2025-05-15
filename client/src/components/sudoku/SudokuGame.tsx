@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSudoku } from "@/lib/stores/useSudoku";
+import { useLanguage } from "@/lib/stores/useLanguage";
 import SudokuBoard from "./SudokuBoard";
 import Controls from "./Controls";
 import Timer from "./Timer";
@@ -37,10 +38,11 @@ import {
 import {
   isDifficultyCompleted,
   markDifficultyCompleted,
-  resetCompletedPuzzles,
 } from "@/lib/sudoku/generator";
+import { LanguageSelector } from "@/components/ui/language-selector";
 
 export default function SudokuGame() {
+  const { t } = useLanguage();
   const {
     generateNewGame,
     checkSolution,
@@ -97,7 +99,7 @@ export default function SudokuGame() {
 
   // 키보드 단축키 처리 함수 추가
   useEffect(() => {
-    // 시크릿 단축키: Alt+R (로컬 스토리지 초기화), Alt+L (리더보드 완료 기록 초기화)
+    // 시크릿 단축키: Alt+R (로컬 스토리지 초기화)
     const handleKeyDown = (e: KeyboardEvent) => {
       // Alt+R 단축키로 로컬 스토리지 초기화
       if (e.altKey && e.key === "r") {
@@ -110,19 +112,6 @@ export default function SudokuGame() {
           window.location.reload();
         } catch (err) {
           console.error("Error clearing storage:", err);
-        }
-      }
-
-      // Alt+L 단축키로 오늘의 리더보드 완료 기록 초기화
-      if (e.altKey && e.key === "l") {
-        try {
-          resetCompletedPuzzles();
-          console.log("Leaderboard completion status reset for today!");
-          alert(
-            "Leaderboard completion status has been reset for today. You can now submit scores for all difficulties again.",
-          );
-        } catch (err) {
-          console.error("Error resetting leaderboard completion status:", err);
         }
       }
     };
@@ -254,15 +243,16 @@ export default function SudokuGame() {
         <CardHeader className="pb-4">
           <div className="flex flex-row justify-between items-center gap-2">
             <div className="flex flex-col">
-              <CardTitle className="text-xl font-bold">Sudoku Puzzle</CardTitle>
+              <CardTitle className="text-xl font-bold">{t('Sudoku Puzzle')}</CardTitle>
               {isPracticeMode && (
                 <span className="text-xs text-amber-600 font-medium mt-1">
-                  Practice Mode (scores will not be saved)
+                  {t('Practice Mode (scores will not be saved)')}
                 </span>
               )}
             </div>
             <div className="flex items-center gap-3">
               <Timer seconds={elapsedSeconds} />
+              <LanguageSelector />
             </div>
           </div>
         </CardHeader>
@@ -272,15 +262,15 @@ export default function SudokuGame() {
             <div className="flex flex-col items-center gap-6 py-8">
               <div className="text-center">
                 <h2 className="text-xl font-semibold mb-2">
-                  Welcome to Sudoku!
+                  {t('Welcome to Sudoku!')}
                 </h2>
                 <p className="text-muted-foreground">
-                  Select a difficulty and start a new game
+                  {t('Select a difficulty and start a new game')}
                 </p>
               </div>
 
               <div className="flex items-center gap-2 w-full max-w-md justify-center mb-2">
-                <h3 className="text-sm font-medium">Select Difficulty</h3>
+                <h3 className="text-sm font-medium">{t('Select Difficulty')}</h3>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -290,26 +280,22 @@ export default function SudokuGame() {
                         className="h-6 w-6 rounded-full"
                       >
                         <HelpCircle className="h-4 w-4" />
-                        <span className="sr-only">Difficulty info</span>
+                        <span className="sr-only">{t('Difficulty info')}</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs">
                       <div className="space-y-2 text-sm">
                         <p>
-                          <strong>Easy:</strong> 50/81 cells filled - For
-                          beginners, straightforward solving techniques.
+                          <strong>{t('Easy')}:</strong> 50/81 {t('cells filled')} - {t('For beginners, straightforward solving techniques.')}
                         </p>
                         <p>
-                          <strong>Medium:</strong> 35/81 cells filled - Requires
-                          more deduction and moderate techniques.
+                          <strong>{t('Medium')}:</strong> 35/81 {t('cells filled')} - {t('Requires more deduction and moderate techniques.')}
                         </p>
                         <p>
-                          <strong>Hard:</strong> 20/81 cells filled -
-                          Challenging puzzles requiring advanced techniques.
+                          <strong>{t('Hard')}:</strong> 20/81 {t('cells filled')} - {t('Challenging puzzles requiring advanced techniques.')}
                         </p>
                         <p className="text-xs italic mt-2">
-                          All puzzles have a unique solution that can be solved
-                          logically.
+                          {t('All puzzles have a unique solution that can be solved logically.')}
                         </p>
                       </div>
                     </TooltipContent>
@@ -323,9 +309,9 @@ export default function SudokuGame() {
                 value={selectedDifficulty || undefined}
               >
                 <TabsList className="grid grid-cols-3">
-                  <TabsTrigger value="easy">Easy</TabsTrigger>
-                  <TabsTrigger value="medium">Medium</TabsTrigger>
-                  <TabsTrigger value="hard">Hard</TabsTrigger>
+                  <TabsTrigger value="easy">{t('Easy')}</TabsTrigger>
+                  <TabsTrigger value="medium">{t('Medium')}</TabsTrigger>
+                  <TabsTrigger value="hard">{t('Hard')}</TabsTrigger>
                 </TabsList>
               </Tabs>
 
@@ -334,12 +320,12 @@ export default function SudokuGame() {
                 onClick={handleNewGame} 
                 disabled={!selectedDifficulty}
               >
-                Start New Game
+                {t('Start New Game')}
               </Button>
 
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Info size={16} />
-                <span>Choose difficulty and press Start to begin!</span>
+                <span>{t('Choose difficulty and press Start to begin!')}</span>
               </div>
             </div>
           ) : (

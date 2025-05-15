@@ -62,33 +62,7 @@ export function isDifficultyCompleted(difficulty: string): boolean {
   }
 }
 
-// 해당 날짜의 모든 완료 기록 초기화 (숨겨진 기능용)
-export function resetCompletedPuzzles(): void {
-  try {
-    const today = getGTMDate();
-    
-    // 기존 완료 목록 로드
-    let completed: Record<string, boolean> = {};
-    const saved = localStorage.getItem(COMPLETED_PUZZLES_KEY);
-    
-    if (saved) {
-      completed = JSON.parse(saved);
-      
-      // 오늘 날짜로 시작하는 모든 키 제거
-      Object.keys(completed).forEach(key => {
-        if (key.startsWith(today)) {
-          delete completed[key];
-        }
-      });
-      
-      // 업데이트된 내용 저장
-      localStorage.setItem(COMPLETED_PUZZLES_KEY, JSON.stringify(completed));
-      console.log(`Reset all completed puzzles for ${today}`);
-    }
-  } catch (err) {
-    console.error('Error resetting completed puzzles:', err);
-  }
-}
+// resetCompletedPuzzles 함수는 더 이상 필요하지 않으므로 제거했습니다.
 
 // 오늘의 날짜를 시드값으로 사용하는 간단한 난수 생성기
 function seededRandom(seed: string): () => number {
