@@ -24,6 +24,7 @@ interface LeaderboardProps {
 }
 
 export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<"easy" | "medium" | "hard">(
     "easy",
   );
@@ -48,7 +49,7 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
 
       try {
         // 선택한 날짜와 난이도에 따라 데이터 가져오기
-        const data = await getLeaderboard(activeTab, 10, selectedDate);
+        const data = await getLeaderboard(activeTab);
 
         // 날짜별 필터링은 클라이언트에서도 처리 (API에서 필터링이 제대로 안될 경우를 대비)
         const datePrefix = getDatePrefix(selectedDate);
@@ -59,7 +60,7 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
         setEntries(filteredData);
       } catch (err) {
         console.error("Failed to load leaderboard:", err);
-        setError("Failed to load the leaderboard. Please try again.");
+        setError(t("Failed to load the leaderboard. Please try again."));
       } finally {
         setLoading(false);
       }
@@ -97,7 +98,7 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
     if (!selectedDate || !isToday(selectedDate)) {
       return (
         <div className="text-center text-sm">
-          Showing historical data for{" "}
+          {t("Showing historical data for")}{" "}
           {selectedDate ? format(selectedDate, "PPP") : ""}
         </div>
       );
