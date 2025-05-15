@@ -434,10 +434,10 @@ export default function SudokuGame() {
         {isGameStarted && (
           <CardFooter className="flex justify-center flex-wrap gap-4 pt-2">
             <Button variant="outline" onClick={handleCheckSolution}>
-              <Check className="mr-2 h-4 w-4" /> Check Solution
+              <Check className="mr-2 h-4 w-4" /> {t('Check Solution')}
             </Button>
             <Button variant="outline" onClick={handleResetGame}>
-              <RefreshCw className="mr-2 h-4 w-4" /> Reset Board
+              <RefreshCw className="mr-2 h-4 w-4" /> {t('Reset Board')}
             </Button>
             <Button
               variant="ghost"
@@ -447,7 +447,7 @@ export default function SudokuGame() {
                 resetTimer();
               }}
             >
-              Back to Main
+              {t('Back to Main')}
             </Button>
           </CardFooter>
         )}

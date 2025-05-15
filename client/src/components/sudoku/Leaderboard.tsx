@@ -116,7 +116,7 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
       <div className="flex items-center justify-center gap-1">
         <RefreshCw className="h-3 w-3" />
         <span>
-          Resets in {diffHrs}h {diffMins}m
+          {t("Resets in")} {diffHrs}h {diffMins}m
         </span>
       </div>
     );
@@ -125,9 +125,9 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-center">Leaderboard</CardTitle>
+        <CardTitle className="text-center">{t('Leaderboard')}</CardTitle>
         <div className="flex items-center justify-center gap-2 text-center mt-1">
-          <div className="text-muted-foreground text-sm">Daily puzzle for</div>
+          <div className="text-muted-foreground text-sm">{t('Daily puzzle for')}</div>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -139,7 +139,7 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
                 {selectedDate ? (
                   format(selectedDate, "PPP")
                 ) : (
-                  <span>Pick a date</span>
+                  <span>{t('Pick a date')}</span>
                 )}
               </Button>
             </PopoverTrigger>
@@ -163,9 +163,9 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
         }
       >
         <TabsList className="grid grid-cols-3 mb-4">
-          <TabsTrigger value="easy">Easy</TabsTrigger>
-          <TabsTrigger value="medium">Medium</TabsTrigger>
-          <TabsTrigger value="hard">Hard</TabsTrigger>
+          <TabsTrigger value="easy">{t('Easy')}</TabsTrigger>
+          <TabsTrigger value="medium">{t('Medium')}</TabsTrigger>
+          <TabsTrigger value="hard">{t('Hard')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value={activeTab}>
@@ -178,7 +178,7 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
               <div className="text-center text-red-500 p-4">{error}</div>
             ) : entries.length === 0 ? (
               <div className="text-center text-muted-foreground p-4">
-                No records yet. Be the first to set a record!
+                {t('No records yet. Be the first to set a record!')}
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -186,11 +186,11 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
                   <thead>
                     <tr className="border-b">
                       <th className="text-left py-2 px-1 w-10">#</th>
-                      <th className="text-left py-2 px-1">Nickname</th>
+                      <th className="text-left py-2 px-1">{t('Nickname')}</th>
                       <th className="text-left py-2 px-1">
                         <div className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
-                          <span>Time</span>
+                          <span>{t('Time')}</span>
                         </div>
                       </th>
                     </tr>
@@ -226,7 +226,7 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
                 <div className="mt-4 pt-2 text-center text-sm text-muted-foreground border-t">
                   {isToday(selectedDate) ? (
                     <>
-                      <div>Leaderboard resets at midnight UTC</div>
+                      <div>{t('Leaderboard resets at midnight UTC')}</div>
                       <div>{getRemainingTimeUntilReset()}</div>
                     </>
                   ) : (
