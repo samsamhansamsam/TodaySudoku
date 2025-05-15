@@ -104,6 +104,7 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
                           <span>Time</span>
                         </div>
                       </th>
+                      <th className="text-left py-2 px-1 hidden md:table-cell">Date</th>
 
                     </tr>
                   </thead>
@@ -118,6 +119,9 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
                         </td>
                         <td className="py-2 px-1 font-medium">{entry.nickname}</td>
                         <td className="py-2 px-1">{formatTime(entry.time_seconds)}</td>
+                        <td className="py-2 px-1 hidden md:table-cell text-muted-foreground">
+                          {formatDate(entry.completed_at as unknown as string)}
+                        </td>
 
                       </tr>
                     ))}

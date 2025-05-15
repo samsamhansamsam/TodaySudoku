@@ -74,6 +74,9 @@ export async function saveLeaderboardEntry(data: LeaderboardEntry) {
 }
 
 export async function getLeaderboard(difficulty: string, limit = 10) {
-  const response = await apiRequest("GET", `/api/leaderboard/${difficulty}?limit=${limit}`);
+  const response = await apiRequest(
+    "GET",
+    `/api/leaderboard/${difficulty}?limit=${limit}`,
+  );
   return await response.json();
 }
