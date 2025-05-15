@@ -40,6 +40,7 @@ import {
   markDifficultyCompleted,
 } from "@/lib/sudoku/generator";
 import { LanguageSelector } from "@/components/ui/language-selector";
+import { Pencil, Eraser } from "lucide-react";
 
 export default function SudokuGame() {
   const { t } = useLanguage();
@@ -55,7 +56,16 @@ export default function SudokuGame() {
     startTimer,
     stopTimer,
     resetTimer,
+    selectedCell,
+    isNoteMode,
+    toggleNoteMode,
+    clearCell,
+    originalBoard,
   } = useSudoku();
+
+  const isOriginalCell = selectedCell
+    ? originalBoard[selectedCell.row][selectedCell.col] !== 0
+    : false;
 
   // 로컬 스토리지에서 게임 시작 상태 복원
   const [isGameStarted, setIsGameStarted] = useState(() => {
@@ -85,7 +95,9 @@ export default function SudokuGame() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [currentBoard, setCurrentBoard] = useState<number[][]>([[]]);
   // 사용자가 선택한 난이도 추적
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(
+    null,
+  );
   // 연습 모드 상태 추가
   const [isPracticeMode, setIsPracticeMode] = useState(false);
 
@@ -152,19 +164,21 @@ export default function SudokuGame() {
     if (hasWon) {
       stopTimer();
       setShowGameOver(true);
-      
+
       // 연습 모드인 경우 리더보드 제출 폼을 표시하지 않음
       if (isPracticeMode) {
         setShowLeaderboardForm(false);
-        
+
         // 연습 모드 완료 메시지 표시
         setTimeout(() => {
-          alert(`${t('Practice mode completed!')} ${t('Your time')}: ${Math.floor(elapsedSeconds / 60)}m ${elapsedSeconds % 60}s`);
+          alert(
+            `${t("Practice mode completed!")} ${t("Your time")}: ${Math.floor(elapsedSeconds / 60)}m ${elapsedSeconds % 60}s`,
+          );
         }, 100);
       } else {
         // 일반 모드에서는 리더보드 제출 폼 표시
         setShowLeaderboardForm(true);
-        
+
         // 난이도 완료 표시
         markDifficultyCompleted(difficulty);
       }
@@ -174,19 +188,19 @@ export default function SudokuGame() {
   const handleNewGame = () => {
     // 선택한 난이도가 없으면 실행하지 않음
     if (!selectedDifficulty) return;
-    
+
     // 선택한 난이도 적용
     const currentDifficulty = selectedDifficulty as "easy" | "medium" | "hard";
     setDifficulty(currentDifficulty);
     setIsPracticeMode(false); // 기본적으로 연습 모드 아님
-    
+
     // 1. 이 난이도가 이미 완료된 경우 연습 모드 플레이 또는 리더보드 선택
     if (isDifficultyCompleted(currentDifficulty)) {
       // 이미 완료된 난이도인 경우 사용자에게 확인
       const playPractice = window.confirm(
-        `${t("You've already completed today's")} ${t(currentDifficulty)} ${t("Would you like to play it again in practice mode?")} ${t("(리더보드 등록은 불가능합니다)")}`
+        `${t("You've already completed today's")} ${t(currentDifficulty)} ${t("Would you like to play it again in practice mode?")} ${t("(리더보드 등록은 불가능합니다)")}`,
       );
-      
+
       if (playPractice) {
         // 연습 모드로 게임 시작
         generateNewGame(currentDifficulty);
@@ -230,12 +244,9 @@ export default function SudokuGame() {
     setSelectedDifficulty(diff);
   };
 
-  const memoizedGetLeaderboard = useCallback(
-    (difficulty: string) => {
-      return getLeaderboard(difficulty as "easy" | "medium" | "hard");
-    },
-    [],
-  );
+  const memoizedGetLeaderboard = useCallback((difficulty: string) => {
+    return getLeaderboard(difficulty as "easy" | "medium" | "hard");
+  }, []);
 
   return (
     <div className="w-full max-w-4xl px-4 py-8">
@@ -243,10 +254,12 @@ export default function SudokuGame() {
         <CardHeader className="pb-4">
           <div className="flex flex-row justify-between items-center gap-2">
             <div className="flex flex-col">
-              <CardTitle className="text-xl font-bold">{t('Sudoku Puzzle')}</CardTitle>
+              <CardTitle className="text-xl font-bold">
+                {t("Sudoku Puzzle")}
+              </CardTitle>
               {isPracticeMode && (
                 <span className="text-xs text-amber-600 font-medium mt-1">
-                  {t('Practice Mode (scores will not be saved)')}
+                  {t("Practice Mode (scores will not be saved)")}
                 </span>
               )}
             </div>
@@ -262,15 +275,17 @@ export default function SudokuGame() {
             <div className="flex flex-col items-center gap-6 py-8">
               <div className="text-center">
                 <h2 className="text-xl font-semibold mb-2">
-                  {t('Welcome to Sudoku!')}
+                  {t("Welcome to Sudoku!")}
                 </h2>
                 <p className="text-muted-foreground">
-                  {t('Select a difficulty and start a new game')}
+                  {t("Select a difficulty and start a new game")}
                 </p>
               </div>
 
               <div className="flex items-center gap-2 w-full max-w-md justify-center mb-2">
-                <h3 className="text-sm font-medium">{t('Select Difficulty')}</h3>
+                <h3 className="text-sm font-medium">
+                  {t("Select Difficulty")}
+                </h3>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -280,22 +295,36 @@ export default function SudokuGame() {
                         className="h-6 w-6 rounded-full"
                       >
                         <HelpCircle className="h-4 w-4" />
-                        <span className="sr-only">{t('Difficulty info')}</span>
+                        <span className="sr-only">{t("Difficulty info")}</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs">
                       <div className="space-y-2 text-sm">
                         <p>
-                          <strong>{t('Easy')}:</strong> 50/81 {t('cells filled')} - {t('For beginners, straightforward solving techniques.')}
+                          <strong>{t("Easy")}:</strong> 75/81{" "}
+                          {t("cells filled")} -{" "}
+                          {t(
+                            "For beginners, straightforward solving techniques.",
+                          )}
                         </p>
                         <p>
-                          <strong>{t('Medium')}:</strong> 35/81 {t('cells filled')} - {t('Requires more deduction and moderate techniques.')}
+                          <strong>{t("Medium")}:</strong> 35/81{" "}
+                          {t("cells filled")} -{" "}
+                          {t(
+                            "Requires more deduction and moderate techniques.",
+                          )}
                         </p>
                         <p>
-                          <strong>{t('Hard')}:</strong> 20/81 {t('cells filled')} - {t('Challenging puzzles requiring advanced techniques.')}
+                          <strong>{t("Hard")}:</strong> 20/81{" "}
+                          {t("cells filled")} -{" "}
+                          {t(
+                            "Challenging puzzles requiring advanced techniques.",
+                          )}
                         </p>
                         <p className="text-xs italic mt-2">
-                          {t('All puzzles have a unique solution that can be solved logically.')}
+                          {t(
+                            "All puzzles have a unique solution that can be solved logically.",
+                          )}
                         </p>
                       </div>
                     </TooltipContent>
@@ -309,23 +338,23 @@ export default function SudokuGame() {
                 value={selectedDifficulty || undefined}
               >
                 <TabsList className="grid grid-cols-3">
-                  <TabsTrigger value="easy">{t('Easy')}</TabsTrigger>
-                  <TabsTrigger value="medium">{t('Medium')}</TabsTrigger>
-                  <TabsTrigger value="hard">{t('Hard')}</TabsTrigger>
+                  <TabsTrigger value="easy">{t("Easy")}</TabsTrigger>
+                  <TabsTrigger value="medium">{t("Medium")}</TabsTrigger>
+                  <TabsTrigger value="hard">{t("Hard")}</TabsTrigger>
                 </TabsList>
               </Tabs>
 
-              <Button 
-                size="lg" 
-                onClick={handleNewGame} 
+              <Button
+                size="lg"
+                onClick={handleNewGame}
                 disabled={!selectedDifficulty}
               >
-                {t('Start New Game')}
+                {t("Start New Game")}
               </Button>
 
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Info size={16} />
-                <span>{t('Choose difficulty and press Start to begin!')}</span>
+                <span>{t("Choose difficulty and press Start to begin!")}</span>
               </div>
             </div>
           ) : (
@@ -333,8 +362,6 @@ export default function SudokuGame() {
               <div className="relative w-full max-w-md aspect-square mb-4">
                 <SudokuBoard />
               </div>
-
-              <Controls />
             </div>
           )}
 
@@ -432,23 +459,66 @@ export default function SudokuGame() {
         </CardContent>
 
         {isGameStarted && (
-          <CardFooter className="flex justify-center flex-wrap gap-4 pt-2">
-            <Button variant="outline" onClick={handleCheckSolution}>
-              <Check className="mr-2 h-4 w-4" /> {t('Check Solution')}
-            </Button>
-            <Button variant="outline" onClick={handleResetGame}>
-              <RefreshCw className="mr-2 h-4 w-4" /> {t('Reset Board')}
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => {
-                // 메인 페이지로 돌아가기
-                setIsGameStarted(false);
-                resetTimer();
-              }}
-            >
-              {t('Back to Main')}
-            </Button>
+          // <CardFooter className="flex justify-center flex-wrap gap-4 pt-2">
+          //   <Button variant="outline" onClick={handleCheckSolution}>
+          //     <Check className="mr-2 h-4 w-4" /> {t('Check Solution')}
+          //   </Button>
+          //   <Button variant="outline" onClick={handleResetGame}>
+          //     <RefreshCw className="mr-2 h-4 w-4" /> {t('Reset Board')}
+          //   </Button>
+          //   <Button
+          //     variant="ghost"
+          //     onClick={() => {
+          //       // 메인 페이지로 돌아가기
+          //       setIsGameStarted(false);
+          //       resetTimer();
+          //     }}
+          //   >
+          //     {t('Back to Main')}
+          //   </Button>
+          // </CardFooter>
+          <CardFooter className="flex flex-col items-center gap-2 pt-2">
+            {/* 1) 숫자패드만 */}
+            <Controls showOnlyNumbers />
+
+            {/* 2) 메모·지우개·초기화·메인으로 버튼 네 개 */}
+            <div className="flex justify-center items-center gap-4">
+              {/* 메모 토글 */}
+              <Button
+                size="icon"
+                variant={isNoteMode ? "default" : "outline"}
+                onClick={toggleNoteMode}
+                disabled={!selectedCell || isOriginalCell || hasWon}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+
+              {/* 지우개 */}
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() =>
+                  selectedCell && clearCell(selectedCell.row, selectedCell.col)
+                }
+                disabled={!selectedCell || isOriginalCell || hasWon}
+              >
+                <Eraser className="h-4 w-4" />
+              </Button>
+
+              {/* 보드 초기화 */}
+              <Button onClick={handleResetGame}>{t("초기화")}</Button>
+
+              {/* 메인으로 돌아가기 */}
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setIsGameStarted(false);
+                  resetTimer();
+                }}
+              >
+                {t("메인으로")}
+              </Button>
+            </div>
           </CardFooter>
         )}
       </Card>

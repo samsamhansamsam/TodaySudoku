@@ -17,10 +17,10 @@ const koStrings: Record<string, string> = {
   'hard': '어려움',
   
   // 메인 화면
-  'Sudoku Puzzle': '스도쿠 퍼즐',
-  'Welcome to Sudoku!': '스도쿠에 오신 것을 환영합니다!',
-  'Select a difficulty and start a new game': '난이도를 선택하고 새 게임을 시작하세요',
-  'Select Difficulty': '난이도 선택',
+  'Sudoku Puzzle': '오늘의 스도쿠',
+  'Welcome to Sudoku!': '하루 한 번! 랭킹에 도전하세요!',
+  'Select a difficulty and start a new game': '난이도마다 한 번씩 도전 가능합니다.',
+  'Select Difficulty': '난이도',
   'Difficulty info': '난이도 정보',
   'Start New Game': '새 게임 시작',
   'Choose difficulty and press Start to begin!': '난이도를 선택하고 시작 버튼을 누르세요!',
