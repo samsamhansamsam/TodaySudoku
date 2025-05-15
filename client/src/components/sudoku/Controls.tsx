@@ -2,11 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Eraser } from "lucide-react";
 import { useEffect } from "react";
 import { useSudoku } from "@/lib/stores/useSudoku";
+import { useLanguage } from "@/lib/stores/useLanguage";
 
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import { cn } from "@/lib/utils";
 
 export default function Controls() {
+  const { t } = useLanguage();
   const { 
     selectedCell, 
     setSelectedCell, 
@@ -154,7 +156,7 @@ export default function Controls() {
           disabled={!selectedCell || isOriginalCell}
         >
           <Pencil className={cn("h-4 w-4", isMobile ? "h-5 w-5" : "")} />
-          <span className={cn(isMobile ? "hidden sm:inline-block" : "")}>Notes</span>
+          <span className={cn(isMobile ? "hidden sm:inline-block" : "")}>{t('Notes')}</span>
         </Button>
         
         <Button
@@ -167,7 +169,7 @@ export default function Controls() {
           disabled={!selectedCell || isOriginalCell}
         >
           <Eraser className={cn("h-4 w-4", isMobile ? "h-5 w-5" : "")} />
-          <span className={cn(isMobile ? "hidden sm:inline-block" : "")}>Erase</span>
+          <span className={cn(isMobile ? "hidden sm:inline-block" : "")}>{t('Clear')}</span>
         </Button>
       </div>
     </div>

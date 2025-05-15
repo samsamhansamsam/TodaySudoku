@@ -159,7 +159,7 @@ export default function SudokuGame() {
         
         // 연습 모드 완료 메시지 표시
         setTimeout(() => {
-          alert(`Practice mode completed! Your time: ${Math.floor(elapsedSeconds / 60)}m ${elapsedSeconds % 60}s`);
+          alert(`${t('Practice mode completed!')} ${t('Your time')}: ${Math.floor(elapsedSeconds / 60)}m ${elapsedSeconds % 60}s`);
         }, 100);
       } else {
         // 일반 모드에서는 리더보드 제출 폼 표시
@@ -184,7 +184,7 @@ export default function SudokuGame() {
     if (isDifficultyCompleted(currentDifficulty)) {
       // 이미 완료된 난이도인 경우 사용자에게 확인
       const playPractice = window.confirm(
-        `You've already completed today's ${currentDifficulty} puzzle. Would you like to play it again in practice mode? (리더보드 등록은 불가능합니다)`
+        `${t("You've already completed today's")} ${t(currentDifficulty)} ${t("Would you like to play it again in practice mode?")} ${t("(리더보드 등록은 불가능합니다)")}`
       );
       
       if (playPractice) {
@@ -343,11 +343,11 @@ export default function SudokuGame() {
               <Card className="w-full max-w-md mx-4">
                 <CardHeader>
                   <CardTitle className="text-center">
-                    {hasWon ? "Congratulations!" : "Game Over!"}
+                    {hasWon ? t("Congratulations!") : "Game Over!"}
                   </CardTitle>
                   <CardDescription className="text-center">
                     {hasWon
-                      ? `You've completed the ${difficulty} puzzle in ${Math.floor(elapsedSeconds / 60)}m ${elapsedSeconds % 60}s!`
+                      ? `${t("You've completed the")} ${t(difficulty)} ${t("puzzle in")} ${Math.floor(elapsedSeconds / 60)}m ${elapsedSeconds % 60}s!`
                       : "The puzzle is still incomplete or has errors."}
                   </CardDescription>
                 </CardHeader>
