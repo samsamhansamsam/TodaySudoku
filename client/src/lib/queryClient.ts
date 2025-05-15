@@ -69,8 +69,16 @@ export const queryClient = new QueryClient({
 
 // 리더보드 API 함수
 export async function saveLeaderboardEntry(data: LeaderboardEntry) {
-  const response = await apiRequest("POST", "/api/leaderboard", data);
-  return await response.json();
+  console.log("Saving leaderboard entry:", data);
+  try {
+    const response = await apiRequest("POST", "/api/leaderboard", data);
+    const result = await response.json();
+    console.log("Leaderboard entry saved successfully:", result);
+    return result;
+  } catch (err) {
+    console.error("Error saving leaderboard entry:", err);
+    throw err;
+  }
 }
 
 export async function getLeaderboard(difficulty: string, limit = 10) {

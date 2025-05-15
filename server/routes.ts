@@ -27,14 +27,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // 새로운 점수 등록하기
   app.post("/api/leaderboard", async (req: Request, res: Response) => {
     try {
+      console.log("Received leaderboard entry:", req.body);
+      
       const parseResult = insertLeaderboardSchema.safeParse(req.body);
       
       if (!parseResult.success) {
+        console.error("Validation failed:", parseResult.error.errors);
         return res.status(400).json({ 
           error: "Invalid request body",
           details: parseResult.error.errors 
         });
       }
+      
+      console.log("Validation successful, data:", parseResult.data);
       
       // 유저 IP 뒤 6자리 가져오기
       const ip = req.ip || req.socket.remoteAddress || "unknown";
@@ -45,7 +50,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         parseResult.data.nickname = `${parseResult.data.nickname} #${lastSixDigits}`;
       }
       
+      console.log("Saving score with nickname:", parseResult.data.nickname);
       const entry = await storage.saveScore(parseResult.data);
+      console.log("Entry saved successfully:", entry);
+      
       res.status(201).json(entry);
     } catch (error) {
       console.error(`Error saving score:`, error);
