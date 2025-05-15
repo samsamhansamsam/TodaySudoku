@@ -84,6 +84,8 @@ export default function SudokuGame() {
   const [currentBoard, setCurrentBoard] = useState<number[][]>([[]]);
   // 사용자가 선택한 난이도 추적
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
+  // 연습 모드 상태 추가
+  const [isPracticeMode, setIsPracticeMode] = useState(false);
 
   // 컴포넌트 언마운트 시 정리 작업
   useEffect(() => {
@@ -161,9 +163,24 @@ export default function SudokuGame() {
     if (hasWon) {
       stopTimer();
       setShowGameOver(true);
-      setShowLeaderboardForm(true);
+      
+      // 연습 모드인 경우 리더보드 제출 폼을 표시하지 않음
+      if (isPracticeMode) {
+        setShowLeaderboardForm(false);
+        
+        // 연습 모드 완료 메시지 표시
+        setTimeout(() => {
+          alert(`Practice mode completed! Your time: ${Math.floor(elapsedSeconds / 60)}m ${elapsedSeconds % 60}s`);
+        }, 100);
+      } else {
+        // 일반 모드에서는 리더보드 제출 폼 표시
+        setShowLeaderboardForm(true);
+        
+        // 난이도 완료 표시
+        markDifficultyCompleted(difficulty);
+      }
     }
-  }, [hasWon, stopTimer]);
+  }, [hasWon, stopTimer, isPracticeMode, difficulty, elapsedSeconds]);
 
   const handleNewGame = () => {
     // 선택한 난이도가 없으면 실행하지 않음
@@ -172,19 +189,37 @@ export default function SudokuGame() {
     // 선택한 난이도 적용
     const currentDifficulty = selectedDifficulty as "easy" | "medium" | "hard";
     setDifficulty(currentDifficulty);
+    setIsPracticeMode(false); // 기본적으로 연습 모드 아님
     
-    // 1. 이 난이도가 이미 완료된 경우 바로 리더보드로 이동
+    // 1. 이 난이도가 이미 완료된 경우 연습 모드 플레이 또는 리더보드 선택
     if (isDifficultyCompleted(currentDifficulty)) {
-      // 이미 완료된 난이도면 바로 리더보드 표시
-      generateNewGame(currentDifficulty); // 오늘의 퍼즐 로드
-      setIsGameStarted(true);
-      setShowGameOver(true);
-      setShowLeaderboardForm(false);
-      setShowLeaderboard(true);
+      // 이미 완료된 난이도인 경우 사용자에게 확인
+      const playPractice = window.confirm(
+        `You've already completed today's ${currentDifficulty} puzzle. Would you like to play it again in practice mode? (리더보드 등록은 불가능합니다)`
+      );
+      
+      if (playPractice) {
+        // 연습 모드로 게임 시작
+        generateNewGame(currentDifficulty);
+        resetTimer();
+        startTimer();
+        setIsGameStarted(true);
+        setShowGameOver(false);
+        setShowLeaderboardForm(false);
+        setShowLeaderboard(false);
+        setIsPracticeMode(true); // 연습 모드로 설정
+      } else {
+        // 리더보드 보기
+        generateNewGame(currentDifficulty); // 오늘의 퍼즐 로드
+        setIsGameStarted(true);
+        setShowGameOver(true);
+        setShowLeaderboardForm(false);
+        setShowLeaderboard(true);
+      }
       return;
     }
 
-    // 2. 새 게임 시작
+    // 2. 새 게임 시작 (처음 플레이하는 경우)
     generateNewGame(currentDifficulty);
     resetTimer();
     startTimer();
@@ -218,7 +253,14 @@ export default function SudokuGame() {
       <Card className="w-full">
         <CardHeader className="pb-4">
           <div className="flex flex-row justify-between items-center gap-2">
-            <CardTitle className="text-xl font-bold">Sudoku Puzzle</CardTitle>
+            <div className="flex flex-col">
+              <CardTitle className="text-xl font-bold">Sudoku Puzzle</CardTitle>
+              {isPracticeMode && (
+                <span className="text-xs text-amber-600 font-medium mt-1">
+                  Practice Mode (scores will not be saved)
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-3">
               <Timer seconds={elapsedSeconds} />
             </div>
