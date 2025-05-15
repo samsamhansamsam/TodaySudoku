@@ -35,9 +35,11 @@ export function Leaderboard({ getLeaderboard }: LeaderboardProps) {
     new Date(),
   );
 
-  // 선택된 날짜로 퍼즐 ID 접두사 생성
+  // 선택된 날짜로 퍼즐 ID 접두사 생성 (YYYY-MM-DD 형식으로 일관되게)
   const getDatePrefix = (date: Date) => {
-    return `${date.getUTCFullYear()}-${(date.getUTCMonth() + 1).toString().padStart(2, "0")}-${date.getUTCDate().toString().padStart(2, "0")}`;
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
+    return `${date.getUTCFullYear()}-${month}-${day}`;
   };
 
   useEffect(() => {

@@ -10,10 +10,13 @@ let dailyPuzzles: {
   };
 } = {};
 
-// GTM 기반 날짜 반환
+// UTC 기반 날짜 반환 (YYYY-MM-DD 형식으로 일관되게)
 function getGTMDate(): string {
   const now = new Date();
-  return `${now.getUTCFullYear()}-${now.getUTCMonth() + 1}-${now.getUTCDate()}`;
+  // 월과 일이 한 자리 수인 경우 앞에 0을 붙여 항상 두 자리로 표현
+  const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(now.getUTCDate()).padStart(2, '0');
+  return `${now.getUTCFullYear()}-${month}-${day}`;
 }
 
 // 완료된 퍼즐 난이도 관리

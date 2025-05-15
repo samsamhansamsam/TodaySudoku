@@ -86,7 +86,9 @@ export async function getLeaderboard(difficulty: string, limit = 10, date?: Date
   const selectedDate = date || new Date();
   
   // ISO 형식으로 날짜를 변환 (YYYY-MM-DD)
-  const dateStr = `${selectedDate.getUTCFullYear()}-${String(selectedDate.getUTCMonth() + 1).padStart(2, '0')}-${String(selectedDate.getUTCDate()).padStart(2, '0')}`;
+  const month = String(selectedDate.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(selectedDate.getUTCDate()).padStart(2, '0');
+  const dateStr = `${selectedDate.getUTCFullYear()}-${month}-${day}`;
   
   // 쿼리 파라미터를 포함한 URL 구성
   const url = `/api/leaderboard/${difficulty}?limit=${limit}&date=${dateStr}`;
